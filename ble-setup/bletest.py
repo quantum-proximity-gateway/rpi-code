@@ -19,7 +19,14 @@ for dev in devices:
         print(dev.addrType)
         mac_address = dev.addr
         try:
-            peripheral = Peripheral(mac_address, addrType=ADDR_TYPE_RANDOM)
+            peripheral = Peripheral(mac_address)
+            print("CONNECTED!")
+            service = peripheral.getServiceByUUID(SERVICE_UUID)
+            characteristic = service.getCharacteristics(CHARACTERISTIC_UUID)[0]
+
+            value = characteristic.read().decode("utf-8")
+            print(f"Value: {value}")
+            peripheral.disconnect()
         except Exception as e:
             print(f"Error: {e}")
         break
