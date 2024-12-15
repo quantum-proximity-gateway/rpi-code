@@ -1,4 +1,5 @@
 from bluepy.btle import Scanner, Peripheral, ADDR_TYPE_PUBLIC, ADDR_TYPE_RANDOM
+
 SERVICE_UUID = "2246ef74-f912-417f-8530-4a7df291d584"
 CHARACTERISTIC_UUID = "a3445e11-5bff-4d2a-a3b1-b127f9567bb6"
 scanner = Scanner()
@@ -17,9 +18,8 @@ for dev in devices:
         print(f"Distance from key: {distance:.2f}")
         print(dev.addrType)
         mac_address = dev.addr
-
         try:
-            peripheral = Peripheral(mac_address, addrType=ADDR_TYPE_PUBLIC)
+            peripheral = Peripheral(mac_address, addrType=ADDR_TYPE_RANDOM)
         except Exception as e:
             print(f"Error: {e}")
         break
