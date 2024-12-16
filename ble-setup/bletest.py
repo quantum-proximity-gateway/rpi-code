@@ -1,32 +1,57 @@
-from bluepy.btle import Scanner, Peripheral, ADDR_TYPE_PUBLIC, ADDR_TYPE_RANDOM
-
+from bluepy.btle import DefaultDelegate, Scanner, Peripheral, ADDR_TYPE_PUBLIC, ADDR_TYPE_RANDOM
+import datetime
 SERVICE_UUID = "2246ef74-f912-417f-8530-4a7df291d584"
 CHARACTERISTIC_UUID = "a3445e11-5bff-4d2a-a3b1-b127f9567bb6"
-scanner = Scanner()
-print('Scanning for devices...')
-devices = scanner.scan(10.0, passive=True) # Passive helps for RPI
+
+class Key():
+    def __init__(self, device_name, mac_address, distance):
+        self.device_name = device_name
+        self.mac_address = mac_address
+        self.distance = distance
+
+keys = []
 addresses = set()
 addresses.add("24:ec:4a:02:54:21")
-for dev in devices:
-    if dev.addr in addresses:
+class ScanDelegate(DefaultDelegate):
+    def __init__(self):
+        DefaultDelegate.__init__(self)
+    
+    def handleDiscovery(self, dev, isNewDev, isNewData):
+        print(f"Device Seen: {dev.addr}")
+        if dev.addr in addresses:
+            distance = self.calculateDistance(dev.rssi)
+            myKey = Key("", dev.addr, distance)
+            print(f"Distance from key: {distance:.2f}")
+            mac_address = dev.addr
+            try:
+                peripheral = Peripheral(mac_address)
+                print("CONNECTED!")
+                service = peripheral.getServiceByUUID(SERVICE_UUID)
+                characteristic = service.getCharacteristics(CHARACTERISTIC_UUID)[0]
+
+                value = characteristic.read().decode("utf-8")
+                print(f"Value: {value}")
+                peripheral.disconnect()
+            except Exception as e:
+                print(f"Error: {e}")
+    
+    def calculateDistance(self, rssi):
         '''
             Distance = 10 ^ ((Measured Power -RSSI)/(10 * N))
             Measured Power = RSSI at 1m
             N = Constant from 2-4 depending on Signal Strength
         '''
-        distance = 10 ** ((-40-int(dev.rssi))/(10*4))
-        print(f"Distance from key: {distance:.2f}")
-        print(dev.addrType)
-        mac_address = dev.addr
-        try:
-            peripheral = Peripheral(mac_address)
-            print("CONNECTED!")
-            service = peripheral.getServiceByUUID(SERVICE_UUID)
-            characteristic = service.getCharacteristics(CHARACTERISTIC_UUID)[0]
+        return 10 ** ((-40-int(rssi))/(10*4))
 
-            value = characteristic.read().decode("utf-8")
-            print(f"Value: {value}")
-            peripheral.disconnect()
-        except Exception as e:
-            print(f"Error: {e}")
-        break
+scanner = Scanner().withDelegate(ScanDelegate())
+
+print('Scanning for devices...')
+scanner.start(passive=True)
+count = 0
+try:
+    while True:
+        scanner.process()
+        print(f'{count}HERE')
+        count += 1
+except KeyboardInterrupt:
+    scanner.stop()
