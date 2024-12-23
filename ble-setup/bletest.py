@@ -32,8 +32,10 @@ class ScanDelegate(DefaultDelegate):
                 value = characteristic.read().decode("utf-8")
                 print(f"Value: {value}")
                 peripheral.disconnect()
+                print('Disconnected.')
             except Exception as e:
                 print(f"Error: {e}")
+
     
     def calculateDistance(self, rssi):
         '''
@@ -43,13 +45,14 @@ class ScanDelegate(DefaultDelegate):
         '''
         return 10 ** ((-40-int(rssi))/(10*4))
 
-scanner = Scanner().withDelegate(ScanDelegate())
-
-print('Scanning for devices...')
-scanner.start(passive=True)
 count = 0
 try:
     while True:
+
+        scanner = Scanner().withDelegate(ScanDelegate())
+
+        print('Scanning for devices...')
+        scanner.start(passive=True)
         scanner.process()
         print(f'{count}HERE')
         count += 1
