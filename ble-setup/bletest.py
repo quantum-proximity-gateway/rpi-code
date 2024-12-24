@@ -60,7 +60,7 @@ try:
 
         print('Scanning for devices...')
         scanner.start(passive=True)
-        scanner.process()
+        scanner.process(timeout=5)
         print(f'{count}HERE')
         count += 1
 except KeyboardInterrupt:
