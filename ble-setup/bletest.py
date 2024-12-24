@@ -52,16 +52,11 @@ class ScanDelegate(DefaultDelegate):
         '''
         return 10 ** ((-40-int(rssi))/(10*4))
 
-count = 0
 try:
     while True:
-
         scanner = Scanner().withDelegate(ScanDelegate())
-
         print('Scanning for devices...')
         scanner.start(passive=True)
         scanner.process(timeout=5)
-        print(f'{count}HERE')
-        count += 1
 except KeyboardInterrupt:
     scanner.stop()
