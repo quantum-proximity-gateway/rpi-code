@@ -1,0 +1,1 @@
+fix rpi problem - ensure device continues the connection + make more reliable
