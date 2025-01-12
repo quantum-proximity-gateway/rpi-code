@@ -19,6 +19,7 @@ class Key():
 keys = []
 addresses = set()
 addresses.add(esp_mac_addr)
+seenDevices = set()
 # addresses.add("24:ec:4a:02:54:21")
 class ScanDelegate(DefaultDelegate):
     def __init__(self):
@@ -26,7 +27,7 @@ class ScanDelegate(DefaultDelegate):
     
     def handleDiscovery(self, dev, isNewDev, isNewData):
         print(f"Device Seen: {dev.addr}")
-        if dev.addr in addresses:
+        if isNewDev and dev.addr in addresses:
             distance = self.calculateDistance(dev.rssi)
             myKey = Key("", dev.addr, distance)
             print(f"Distance from key: {distance:.2f}")
@@ -38,6 +39,7 @@ class ScanDelegate(DefaultDelegate):
                     characteristic = service.getCharacteristics(CHARACTERISTIC_UUID)[0]
                     value = characteristic.read().decode("utf-8")
                     print(f"Value: {value}")
+                    seenDevices.add({mac_address: value})
                     peripheral.disconnect()  
                     print("Disconnected,")
             except Exception as e:
