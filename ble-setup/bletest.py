@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import datetime
 import os
 from time import sleep
-from collections import defaultdict
+import json
 
 load_dotenv()
 esp_mac_addr = os.getenv("ESP32_MAC_ADDRESS")
@@ -28,13 +28,11 @@ class ScanDelegate(DefaultDelegate):
         DefaultDelegate.__init__(self)
     
     def handleDiscovery(self, dev, isNewDev, isNewData):
-        
         if dev.addr in addresses:
             mac_address = dev.addr
             devices[mac_address] = {}
             distance = self.calculateDistance(dev.rssi)
             devices[mac_address]['distance'] = distance
-           
             try:
                 with Peripheral(mac_address) as peripheral:
                     
@@ -44,7 +42,7 @@ class ScanDelegate(DefaultDelegate):
                     value = characteristic.read().decode("utf-8")
                     print(f"Value: {value}")
                     seenDevices.add(mac_address)
-                    devices[mac_address]['value'] = value
+                    devices[mac_address]['value'] = json.loads(value)
                     peripheral.disconnect()
                     
                     print("Disconnected.")
@@ -52,8 +50,7 @@ class ScanDelegate(DefaultDelegate):
                 print(f"Error: {e}")
             finally:
                 sleep(2)
-        elif dev.addr in addresses:
-            devices[dev.addr]['distance'] = self.calculateDistance(dev.rssi)
+        
 
     
     def calculateDistance(self, rssi):
