@@ -31,15 +31,14 @@ class ScanDelegate(DefaultDelegate):
             print(f"Distance from key: {distance:.2f}")
             mac_address = dev.addr
             try:
-                peripheral = Peripheral(mac_address)
-                print("CONNECTED!")
-                service = peripheral.getServiceByUUID(SERVICE_UUID)
-                characteristic = service.getCharacteristics(CHARACTERISTIC_UUID)[0]
-
-                value = characteristic.read().decode("utf-8")
-                print(f"Value: {value}")
-                peripheral.disconnect()
-                print('Disconnected.')
+                with Peripheral(mac_address) as peripheral:
+                    print("CONNECTED!")
+                    service = peripheral.getServiceByUUID(SERVICE_UUID)
+                    characteristic = service.getCharacteristics(CHARACTERISTIC_UUID)[0]
+                    value = characteristic.read().decode("utf-8")
+                    print(f"Value: {value}")
+                    peripheral.disconnect()
+                    print('Disconnected.')
             except Exception as e:
                 print(f"Error: {e}")
 
