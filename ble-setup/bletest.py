@@ -37,10 +37,11 @@ class ScanDelegate(DefaultDelegate):
                     characteristic = service.getCharacteristics(CHARACTERISTIC_UUID)[0]
                     value = characteristic.read().decode("utf-8")
                     print(f"Value: {value}")
-                    peripheral.disconnect()
-                    print('Disconnected.')
             except Exception as e:
                 print(f"Error: {e}")
+            finally:
+                peripheral.disconnect()  
+                print("Disconnected,")
 
     
     def calculateDistance(self, rssi):
