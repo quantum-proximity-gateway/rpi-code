@@ -2,6 +2,7 @@ from bluepy.btle import DefaultDelegate, Scanner, Peripheral, ADDR_TYPE_PUBLIC, 
 from dotenv import load_dotenv
 import datetime
 import os
+from time import sleep
 
 load_dotenv()
 esp_mac_addr = os.getenv("ESP32_MAC_ADDRESS")
@@ -37,11 +38,11 @@ class ScanDelegate(DefaultDelegate):
                     characteristic = service.getCharacteristics(CHARACTERISTIC_UUID)[0]
                     value = characteristic.read().decode("utf-8")
                     print(f"Value: {value}")
+                    peripheral.disconnect()  
+                    print("Disconnected,")
             except Exception as e:
                 print(f"Error: {e}")
-            finally:
-                peripheral.disconnect()  
-                print("Disconnected,")
+                
 
     
     def calculateDistance(self, rssi):
@@ -58,5 +59,6 @@ try:
         print('Scanning for devices...')
         scanner.start(passive=True)
         scanner.process(timeout=5)
+        sleep(5)
 except KeyboardInterrupt:
     scanner.stop()
