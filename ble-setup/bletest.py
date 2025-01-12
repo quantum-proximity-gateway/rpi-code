@@ -42,6 +42,8 @@ class ScanDelegate(DefaultDelegate):
                     print("Disconnected,")
             except Exception as e:
                 print(f"Error: {e}")
+            finally:
+                sleep(2)
                 
 
     
@@ -59,6 +61,5 @@ try:
         print('Scanning for devices...')
         scanner.start(passive=True)
         scanner.process(timeout=5)
-        sleep(5)
 except KeyboardInterrupt:
     scanner.stop()
