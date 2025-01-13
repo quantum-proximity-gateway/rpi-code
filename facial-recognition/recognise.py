@@ -14,11 +14,11 @@ known_face_names = data["names"]
 
 # Initialize the camera
 picam2 = Picamera2()
-picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (1920, 1080)}))
+picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (1280, 720)}))
 picam2.start()
 
 # Initialize our variables
-cv_scaler = 10 # this has to be a whole number
+cv_scaler = 8 # this has to be a whole number
 
 face_locations = []
 face_encodings = []
