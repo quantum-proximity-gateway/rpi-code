@@ -124,6 +124,8 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.face_rec
+face_rec/
 env/
 venv/
 ENV/
