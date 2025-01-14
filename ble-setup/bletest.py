@@ -35,8 +35,8 @@ class ScanDelegate(DefaultDelegate):
             devices[mac_address]['distance'] = distance
             try:
                 with Peripheral(mac_address) as peripheral:
-                    
-                    print("CONNECTED!")
+                    print("Device is " + str(distance) + "m away.")
+                    print("Connected.")
                     service = peripheral.getServiceByUUID(SERVICE_UUID)
                     characteristic = service.getCharacteristics(CHARACTERISTIC_UUID)[0]
                     value = characteristic.read().decode("utf-8")
