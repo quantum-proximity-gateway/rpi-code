@@ -40,6 +40,26 @@ def get_all_mac_addresses():
         print(f"Error occurred while fetching MAC addresses: {e}")
         return []
 
+def get_username_for_mac_address(mac_address):
+    try:
+        response = requests.get(f"{server_url}/devices/{mac_address}/username")
+        response.raise_for_status()
+        data = response.json()
+
+        return data.get("username", "invalid")
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching username for MAC address {mac_address}: {e}")
+        return "error"
+
+def get_all_usernames(list_mac_addresses):
+    usernames = []
+    for mac in list_mac_addresses:
+        username = get_username_for_mac_address(mac)
+        usernames.append(username)
+
+    return usernames
+
 # addresses = set(get_all_mac_addresses())
     
 class ScanDelegate(DefaultDelegate):
@@ -96,7 +116,9 @@ try:
         print(f"within_range_mac_addresses: {within_range_mac_addresses}")
 
         # get all usernames for each device via mac address from server
-
+        all_usernames = get_all_usernames(within_range_mac_addresses)
+        print(f"all_usernames: {all_usernames}")
+        
         # send list of usernames to facial recog script
 
         # if any username is recognised, return username
