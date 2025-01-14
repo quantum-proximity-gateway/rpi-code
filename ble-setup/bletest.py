@@ -26,7 +26,7 @@ addresses = set()
 addresses.add(esp_mac_addr)
 addresses.add("24:ec:4a:02:54:21")
 
-server_url = ""
+server_url = "https://858c-144-82-8-82.ngrok-free.app"
 
 def get_all_mac_addresses():
     try:
@@ -54,9 +54,12 @@ def get_username_for_mac_address(mac_address):
 
 def get_all_usernames(list_mac_addresses):
     usernames = []
+    filter_out = ["invalid", "error"]
+    
     for mac in list_mac_addresses:
         username = get_username_for_mac_address(mac)
-        usernames.append(username)
+        if username not in filter_out:
+            usernames.append(username)
 
     return usernames
 
@@ -115,7 +118,7 @@ try:
         within_range_mac_addresses = [mac for mac in devices if devices[mac]['distance'] <= 3]
         print(f"within_range_mac_addresses: {within_range_mac_addresses}")
 
-        # get all usernames for each device via mac address from server
+        # get all usernames for each device via mac address from server       
         all_usernames = get_all_usernames(within_range_mac_addresses)
         print(f"all_usernames: {all_usernames}")
         

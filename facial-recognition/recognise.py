@@ -5,6 +5,7 @@ from picamera2 import Picamera2
 import time
 import pickle
 import keyboard
+import sys
 
 # Load pre-trained face encodings
 print("[INFO] loading encodings...")
@@ -90,36 +91,40 @@ def process_frame(frame, person_checking_name):
 #     return fps
 
 person_checking_name = input("Enter the name of the person (case sensitive) who you are searching for: ")
-while True:
-    # Capture a frame from camera
-    frame = picam2.capture_array()
-    
-    # Process the frame with the function
-    processed_frame, person_checking_found = process_frame(frame, person_checking_name)
-    print(person_checking_found)
-    if person_checking_found:
-        pass # input stuff
 
-    if keyboard.is_pressed('q'):
-        print("[INFO] 'q' pressed. Quitting program.")
-        break
+if len(sys.argv) <= 1:
+    print("must have 1 or more names searching for")
+else:
+    while True:
+        # Capture a frame from camera
+        frame = picam2.capture_array()
     
-    # # Get the text and boxes to be drawn based on the processed frame
-    # display_frame = draw_results(processed_frame)
+        # Process the frame with the function
+        processed_frame, person_checking_found = process_frame(frame, person_checking_name)
+        print(person_checking_found)
+        if person_checking_found:
+            pass # input stuff
+
+        if keyboard.is_pressed('q'):
+            print("[INFO] 'q' pressed. Quitting program.")
+            break
     
-    # # Calculate and update FPS
-    # current_fps = calculate_fps()
+        # # Get the text and boxes to be drawn based on the processed frame
+        # display_frame = draw_results(processed_frame)
     
-    # # Attach FPS counter to the text and boxes
-    # cv2.putText(display_frame, f"FPS: {current_fps:.1f}", (display_frame.shape[1] - 150, 30), 
-    #             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        # # Calculate and update FPS
+        # current_fps = calculate_fps()
     
-    # # Display everything over the video feed.
-    # cv2.imshow('Video', display_frame)
+        # # Attach FPS counter to the text and boxes
+        # cv2.putText(display_frame, f"FPS: {current_fps:.1f}", (display_frame.shape[1] - 150, 30), 
+        #             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
     
-    # # Break the loop and stop the script if 'q' is pressed
-    # if cv2.waitKey(1) == ord("q"):
-    #     break
+        # # Display everything over the video feed.
+        # cv2.imshow('Video', display_frame)
+    
+        # # Break the loop and stop the script if 'q' is pressed
+        # if cv2.waitKey(1) == ord("q"):
+        #     break
 
 # By breaking the loop we run this code here which closes everything
 cv2.destroyAllWindows()
