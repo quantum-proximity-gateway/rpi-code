@@ -127,5 +127,5 @@ else:
         #     break
 
 # By breaking the loop we run this code here which closes everything
-cv2.destroyAllWindows()
-picam2.stop()
+# cv2.destroyAllWindows()
+# picam2.stop()

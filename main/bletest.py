@@ -8,10 +8,10 @@ import requests
 import subprocess
 import sys
 
+import recognise
+
 # load_dotenv()
 # esp_mac_addr = os.getenv("ESP32_MAC_ADDRESS")
-
-import recognise
 
 SERVICE_UUID = "2246ef74-f912-417f-8530-4a7df291d584"
 CHARACTERISTIC_UUID = "a3445e11-5bff-4d2a-a3b1-b127f9567bb6"
@@ -122,11 +122,14 @@ try:
         within_range_mac_addresses = [mac for mac in devices if devices[mac]['distance'] <= 3]
         print(f"within_range_mac_addresses: {within_range_mac_addresses}")
 
-        # get all usernames for each device via mac address from server       
+        # get all usernames for each device via mac address from server
         all_usernames = get_all_usernames(within_range_mac_addresses)
         print(f"all_usernames: {all_usernames}")
         
         # send list of usernames to facial recog script
+        start_time_loop = time.time()
+        while time.time() - start_time_loop < 10:
+            pass
 
         # if any username is recognised, return username
 
