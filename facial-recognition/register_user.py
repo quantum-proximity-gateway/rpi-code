@@ -1,10 +1,9 @@
 import cv2
+import sys
 import os
 from datetime import datetime
 from picamera2 import Picamera2
 import time
-
-PERSON_NAME = input("Enter the person's name: ")
 
 def create_folder(name):
     dataset_folder = "dataset"
@@ -57,4 +56,8 @@ def capture_photos(name):
     print(f"Photo capture completed. {photo_count} photos saved for {name}.")
 
 if __name__ == "__main__":
-    capture_photos(PERSON_NAME)
+    if len(sys.argv) != 2:
+        print("command must have a single additional argument - the person's name")
+    else:
+        PERSON_NAME = sys.argv[1]
+        capture_photos(PERSON_NAME)
