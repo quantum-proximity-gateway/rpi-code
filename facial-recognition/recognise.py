@@ -4,6 +4,7 @@ import numpy as np
 from picamera2 import Picamera2
 import time
 import pickle
+import keyboard
 
 # Load pre-trained face encodings
 print("[INFO] loading encodings...")
@@ -98,6 +99,10 @@ while True:
     print(person_checking_found)
     if person_checking_found:
         pass # input stuff
+
+    if keyboard.is_pressed('q'):
+        print("[INFO] 'q' pressed. Quitting program.")
+        break
     
     # # Get the text and boxes to be drawn based on the processed frame
     # display_frame = draw_results(processed_frame)
