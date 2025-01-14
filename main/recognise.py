@@ -89,25 +89,29 @@ def process_frame(frame, person_checking_name):
 #         frame_count = 0
 #         start_time = time.time()
 #     return fps
+def main_loop(list_of_names):
 
-person_checking_name = input("Enter the name of the person (case sensitive) who you are searching for: ")
+    if len(sys.argv) <= 0:
+        print("must have 1 or more names searching for")
+    else:
+        start_time_loop = time.time()
+        while time.time() - start_time_loop < 10:
+            # Capture a frame from camera
+            frame = picam2.capture_array()
+            person_found = False
+            # Process the frame with the function
+            for name in list_of_names:
+                processed_frame, person_checking_found = process_frame(frame, name)
+                if person_checking_found:
+                    person_found = True
+                    print(name, "was found.")
+                    break
+            if person_found:
+                break
 
-if len(sys.argv) <= 0:
-    print("must have 1 or more names searching for")
-else:
-    while True:
-        # Capture a frame from camera
-        frame = picam2.capture_array()
-    
-        # Process the frame with the function
-        processed_frame, person_checking_found = process_frame(frame, person_checking_name)
-        print(person_checking_found)
-        if person_checking_found:
-            pass # input stuff
-
-        if keyboard.is_pressed('q'):
-            print("[INFO] 'q' pressed. Quitting program.")
-            break
+            if keyboard.is_pressed('q'):
+                print("[INFO] 'q' pressed. Quitting program.")
+                break
     
         # # Get the text and boxes to be drawn based on the processed frame
         # display_frame = draw_results(processed_frame)

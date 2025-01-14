@@ -8,7 +8,7 @@ import requests
 import subprocess
 import sys
 import time
-
+from recognise import main_loop
 
 # load_dotenv()
 # esp_mac_addr = os.getenv("ESP32_MAC_ADDRESS")
@@ -127,9 +127,8 @@ try:
         print(f"all_usernames: {all_usernames}")
         
         # send list of usernames to facial recog script
-        start_time_loop = time.time()
-        while time.time() - start_time_loop < 10:
-            pass
+        main_loop(all_usernames)
+            
 
         # if any username is recognised, return username
 
