@@ -7,6 +7,7 @@ name = "pypi"
 bluepy = "*"
 python-dotenv = "*"
 requests = "*"
+subprocess = "*"
 
 [dev-packages]
 

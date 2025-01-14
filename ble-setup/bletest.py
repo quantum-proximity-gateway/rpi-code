@@ -5,6 +5,7 @@ import os
 from time import sleep
 import json
 import requests
+import subprocess
 
 load_dotenv()
 esp_mac_addr = os.getenv("ESP32_MAC_ADDRESS")
@@ -22,9 +23,9 @@ keys = []
 devices = {}
 seenDevices = set()
 
-addresses = set()
-addresses.add(esp_mac_addr)
-addresses.add("24:ec:4a:02:54:21")
+# addresses = set()
+# addresses.add(esp_mac_addr)
+# addresses.add("24:ec:4a:02:54:21")
 
 server_url = "https://858c-144-82-8-82.ngrok-free.app"
 
@@ -63,7 +64,7 @@ def get_all_usernames(list_mac_addresses):
 
     return usernames
 
-# addresses = set(get_all_mac_addresses())
+addresses = set(get_all_mac_addresses())
     
 class ScanDelegate(DefaultDelegate):
     def __init__(self):
