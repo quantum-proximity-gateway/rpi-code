@@ -4,6 +4,7 @@ import datetime
 import os
 from time import sleep
 import json
+import requests
 
 load_dotenv()
 esp_mac_addr = os.getenv("ESP32_MAC_ADDRESS")
@@ -18,21 +19,43 @@ class Key():
         self.distance = distance
 
 keys = []
-addresses = set()
-addresses.add(esp_mac_addr)
 devices = {}
 seenDevices = set()
-# addresses.add("24:ec:4a:02:54:21")
+
+addresses = set()
+addresses.add(esp_mac_addr)
+addresses.add("24:ec:4a:02:54:21")
+
+server_url = ""
+
+def get_all_mac_addresses():
+    try:
+        response = requests.get(f"{server_url}/devices/all-mac-addresses")
+        response.raise_for_status()
+        mac_addresses = response.json()
+
+        return [mac.strip() for mac in mac_addresses]
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error occurred while fetching MAC addresses: {e}")
+        return []
+
+# addresses = set(get_all_mac_addresses())
+    
 class ScanDelegate(DefaultDelegate):
     def __init__(self):
         DefaultDelegate.__init__(self)
     
     def handleDiscovery(self, dev, isNewDev, isNewData):
         if dev.addr in addresses:
+            distance = self.calculateDistance(dev.rssi)
+            print("Device is " + str(distance) + "m away.")
+            print("Device found:", dev.addr, "RSSI:", dev.rssi)
             mac_address = dev.addr
             devices[mac_address] = {}
             distance = self.calculateDistance(dev.rssi)
             devices[mac_address]['distance'] = distance
+            print(f"{mac_address} is " + str(distance) + "m away.")
             try:
                 with Peripheral(mac_address) as peripheral:
                     print("Device is " + str(distance) + "m away.")
@@ -49,7 +72,7 @@ class ScanDelegate(DefaultDelegate):
             except Exception as e:
                 print(f"Error: {e}")
             finally:
-                sleep(2)
+                sleep(1)
         
 
     
@@ -70,6 +93,7 @@ try:
 
         # filter devices by 3m or less
         within_range_mac_addresses = [mac for mac in devices if devices[mac]['distance'] <= 3]
+        print(f"within_range_mac_addresses: {within_range_mac_addresses}")
 
         # get all usernames for each device via mac address from server
 
