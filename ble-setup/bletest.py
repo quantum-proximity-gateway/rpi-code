@@ -67,5 +67,15 @@ try:
         print('Scanning for devices...')
         scanner.start(passive=True)
         scanner.process(timeout=5)
+
+        # filter devices by 3m or less
+        within_range_mac_addresses = [mac for mac in devices if devices[mac]['distance'] <= 3]
+
+        # get all usernames for each device via mac address from server
+
+        # send list of usernames to facial recog script
+
+        # if any username is recognised, return username
+
 except KeyboardInterrupt:
     scanner.stop()
