@@ -4,8 +4,7 @@ from datetime import datetime
 from picamera2 import Picamera2
 import time
 
-# Change this to the name of the person you're photographing
-PERSON_NAME = "jaryd"  
+PERSON_NAME = input("Enter the person's name: ")
 
 def create_folder(name):
     dataset_folder = "dataset"
@@ -30,7 +29,7 @@ def capture_photos(name):
 
     photo_count = 0
     
-    print(f"Taking photos for {name}. Press SPACE to capture, 'q' to quit.")
+    print(f"Taking photos for {name}. Press SPACE to capture, 'q' to quit.\nWe recommend taking at least 5 different photos.")
     
     while True:
         # Capture frame from Pi Camera
