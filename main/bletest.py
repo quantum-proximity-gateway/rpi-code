@@ -1,14 +1,17 @@
 from bluepy.btle import DefaultDelegate, Scanner, Peripheral, ADDR_TYPE_PUBLIC, ADDR_TYPE_RANDOM
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import datetime
 import os
 from time import sleep
 import json
 import requests
 import subprocess
+import sys
 
-load_dotenv()
-esp_mac_addr = os.getenv("ESP32_MAC_ADDRESS")
+# load_dotenv()
+# esp_mac_addr = os.getenv("ESP32_MAC_ADDRESS")
+
+import recognise
 
 SERVICE_UUID = "2246ef74-f912-417f-8530-4a7df291d584"
 CHARACTERISTIC_UUID = "a3445e11-5bff-4d2a-a3b1-b127f9567bb6"
@@ -65,7 +68,7 @@ def get_all_usernames(list_mac_addresses):
     return usernames
 
 addresses = set(get_all_mac_addresses())
-    
+
 class ScanDelegate(DefaultDelegate):
     def __init__(self):
         DefaultDelegate.__init__(self)
