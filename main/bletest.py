@@ -1,17 +1,8 @@
-from bluepy.btle import DefaultDelegate, Scanner, Peripheral, ADDR_TYPE_PUBLIC, ADDR_TYPE_RANDOM
-# from dotenv import load_dotenv
-import datetime
-import os
+from bluepy.btle import DefaultDelegate, Scanner, Peripheral
 from time import sleep
 import json
 import requests
-import subprocess
-import sys
-import time
 from recognise import main_loop
-
-# load_dotenv()
-# esp_mac_addr = os.getenv("ESP32_MAC_ADDRESS")
 
 SERVICE_UUID = "2246ef74-f912-417f-8530-4a7df291d584"
 CHARACTERISTIC_UUID = "a3445e11-5bff-4d2a-a3b1-b127f9567bb6"
