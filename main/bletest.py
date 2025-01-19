@@ -26,11 +26,7 @@ keys = []
 devices = {}
 seenDevices = set()
 
-# addresses = set()
-# addresses.add(esp_mac_addr)
-# addresses.add("24:ec:4a:02:54:21")
-
-server_url = "https://858c-144-82-8-82.ngrok-free.app"
+server_url = "https://2b6a-31-205-125-227.ngrok-free.app"
 
 def get_all_mac_addresses():
     try:
