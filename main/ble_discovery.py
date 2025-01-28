@@ -4,6 +4,7 @@ import json
 import requests
 from recognise import main_loop
 
+
 SERVICE_UUID = "2246ef74-f912-417f-8530-4a7df291d584"
 CHARACTERISTIC_UUID = "a3445e11-5bff-4d2a-a3b1-b127f9567bb6"
 
@@ -81,7 +82,6 @@ class ScanDelegate(DefaultDelegate):
                     seenDevices.add(mac_address)
                     devices[mac_address]['value'] = json.loads(value)
                     peripheral.disconnect()
-                    
                     print("Disconnected.")
             except Exception as e:
                 print(f"Error: {e}")
