@@ -39,20 +39,20 @@ export default function Home() {
     // Call API every half second to update the user data
     const interval = setInterval(() => {
       getUserData().then(data => setUsers(data));
-    }, 500);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
 
   return (
-    <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "50px"}}>
+    <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "50px", padding: "50px"}}>
       {users.map(user => (
-        <div>
-          <p>Name: {user.name}</p>
-          <p>Logged In: {user.loggedIn ? "Yes" : "No"}</p>
-          <div key={user.name} style={{display: "flex", width: "200px", height: "200px", backgroundColor: "red", borderRadius: "50%"}}>
-            <p style={{margin: "auto"}}>{user.distance}</p>
+        <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: "5px"}}>
+          <p>{user.name}</p>
+          <div key={user.name} style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", width: "200px", height: "200px", backgroundColor: "red", borderRadius: "50%"}}>
+            <p>{user.distance.toFixed(2)}m</p>
+            {user.loggedIn && <p>Logged In</p>}
           </div>
         </div>
       ))}
