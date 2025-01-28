@@ -50,7 +50,7 @@ export default function Home() {
       {users.map(user => (
         <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: "5px"}}>
           <p>{user.name}</p>
-          <div key={user.name} style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", width: "200px", height: "200px", backgroundColor: "red", borderRadius: "50%"}}>
+          <div key={user.name} style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", width: "200px", height: "200px", backgroundColor: user.loggedIn ? "blue" : user.distance < 3 ? "green" : "red", borderRadius: "50%"}}>
             <p>{user.distance.toFixed(2)}m</p>
             {user.loggedIn && <p>Logged In</p>}
           </div>
