@@ -44,18 +44,32 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
+  const calculateCircleSize = (distance: number) => {
+    const minSize = 50;
+    const maxSize = 300;
+    
+    const maxDistance = 10;
+    const clampedDistance = Math.min(distance, maxDistance);
+    
+    const size = maxSize - (clampedDistance / maxDistance) * (maxSize - minSize);
+    return size;
+  }
 
   return (
     <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "50px", padding: "50px"}}>
-      {users.map(user => (
-        <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: "5px"}}>
-          <p>{user.name}</p>
-          <div key={user.name} style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", width: "200px", height: "200px", backgroundColor: user.loggedIn ? "blue" : user.distance < 3 ? "green" : "red", borderRadius: "50%"}}>
-            <p>{user.distance.toFixed(2)}m</p>
-            {user.loggedIn && <p>Logged In</p>}
+      {users.map(user => {
+        const circleSize = calculateCircleSize(user.distance);
+
+        return (
+          <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: "5px"}}>
+            <p>{user.name}</p>
+            <div key={user.name} style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", width: `${circleSize}px`, height: `${circleSize}px`, backgroundColor: user.loggedIn ? "blue" : user.distance < 3 ? "green" : "red", borderRadius: "50%", overflow: "hidden", whiteSpace: "nowrap"}}>
+              <p>{user.distance.toFixed(2)}m</p>
+              {user.loggedIn && <p>Logged In</p>}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
