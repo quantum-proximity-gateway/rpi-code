@@ -20,15 +20,26 @@ export default function Home() {
   const [users, setUsers] = useState<User[]>([]);
 
   async function getUserData(): Promise<User[]> {
-    const response = await fetch("http://localhost:8000/api/users");
-    const data = await response.json();
-    return data;
+    // const response = await fetch("http://localhost:8000/api/users");
+    // const data = await response.json();
+    // return data;
+
+    // Placeholder data
+    const data: User[] = [
+      { name: "Alice", distance: Math.random()*10, loggedIn: false },
+      { name: "Bob", distance: Math.random()*10, loggedIn: true },
+      { name: "Charlie", distance: Math.random()*10, loggedIn: false },
+      { name: "Dale", distance: Math.random()*10, loggedIn: true },
+    ];
+    // Simulate API response delay
+    return new Promise(resolve => setTimeout(() => resolve(data), 100));
   }
 
   useEffect(() => {
+    // Call API every half second to update the user data
     const interval = setInterval(() => {
       getUserData().then(data => setUsers(data));
-    }, 500); // Calling the API every half second to update the user data
+    }, 500);
 
     return () => clearInterval(interval);
   }, []);
