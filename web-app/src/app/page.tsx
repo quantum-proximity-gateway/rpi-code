@@ -26,19 +26,20 @@ export default function Home() {
 
     // Placeholder data
     const data: User[] = [
-      { name: "Alice", distance: 2.5, loggedIn: false },
-      { name: "Bob", distance: 4.0, loggedIn: true },
-      { name: "Charlie", distance: 1.0, loggedIn: false },
-      { name: "Dale", distance: 0.5, loggedIn: true },
+      { name: "Alice", distance: Math.random()*10, loggedIn: false },
+      { name: "Bob", distance: Math.random()*10, loggedIn: true },
+      { name: "Charlie", distance: Math.random()*10, loggedIn: false },
+      { name: "Dale", distance: Math.random()*10, loggedIn: true },
     ];
     // Simulate API response delay
     return new Promise(resolve => setTimeout(() => resolve(data), 100));
   }
 
   useEffect(() => {
+    // Call API every half second to update the user data
     const interval = setInterval(() => {
       getUserData().then(data => setUsers(data));
-    }, 500); // Calling the API every half second to update the user data
+    }, 500);
 
     return () => clearInterval(interval);
   }, []);
