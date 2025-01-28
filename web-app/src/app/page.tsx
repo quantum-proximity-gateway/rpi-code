@@ -26,10 +26,10 @@ export default function Home() {
 
     // Placeholder data
     const data: User[] = [
-      { name: "Alice", distance: Math.random()*10, loggedIn: false },
+      { name: "Alice", distance: 0, loggedIn: false },
       { name: "Bob", distance: Math.random()*10, loggedIn: true },
       { name: "Charlie", distance: Math.random()*10, loggedIn: false },
-      { name: "Dale", distance: Math.random()*10, loggedIn: true },
+      { name: "Dale", distance: Math.random()*10, loggedIn: false },
     ];
     // Simulate API response delay
     return new Promise(resolve => setTimeout(() => resolve(data), 100));
@@ -46,17 +46,14 @@ export default function Home() {
 
   const calculateCircleSize = (distance: number) => {
     const minSize = 50;
-    const maxSize = 300;
-    
-    const maxDistance = 10;
-    const clampedDistance = Math.min(distance, maxDistance);
-    
-    const size = maxSize - (clampedDistance / maxDistance) * (maxSize - minSize);
-    return size;
+    const maxSize = 350;
+        
+    const size = minSize + (maxSize - minSize) / distance;
+    return Math.min(Math.max(size, minSize), maxSize);
   }
 
   return (
-    <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "50px", padding: "50px"}}>
+    <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", flexWrap: "wrap", height: "100vh", gap: "50px", padding: "50px"}}>
       {users.map(user => {
         const circleSize = calculateCircleSize(user.distance);
 
