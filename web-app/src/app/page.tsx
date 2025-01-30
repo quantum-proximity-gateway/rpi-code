@@ -60,7 +60,7 @@ export default function Home() {
         return (
           <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: "5px"}}>
             <p>{user.name}</p>
-            <div key={user.name} style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", width: `${circleSize}px`, height: `${circleSize}px`, border:`3px solid ${user.loggedIn ? "blue" : user.distance < 3 ? "green" : "red"}`, borderRadius: "50%", overflow: "hidden", whiteSpace: "nowrap"}}>
+            <div key={user.name} style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", width: `${circleSize}px`, height: `${circleSize}px`, border:`3px solid ${user.loggedIn ? "blue" : user.distance < 3 ? "green" : "red"}`, borderRadius: "50%", overflow: "hidden", whiteSpace: "nowrap" ,transition: "width 0.5s, height 0.5s, border-color 0.5s"}}>
               <p>{user.distance.toFixed(2)}m</p>
               {user.loggedIn && <p>Logged In</p>}
             </div>
