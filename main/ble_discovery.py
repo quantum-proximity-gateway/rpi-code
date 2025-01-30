@@ -5,22 +5,22 @@ from flask import Flask, jsonify
 import json
 import requests
 from recognise import main_loop
+from pydantic import BaseModel
 
 app = Flask(__name__)
+
+
+# Specific model needed by front-end
+class User(BaseModel):
+    name: str
+    distance: float
+    loggedIn: bool
 
 SERVICE_UUID = "2246ef74-f912-417f-8530-4a7df291d584"
 CHARACTERISTIC_UUID = "a3445e11-5bff-4d2a-a3b1-b127f9567bb6"
 
-class Key():
-    def __init__(self, device_name, mac_address, distance):
-        self.device_name = device_name
-        self.mac_address = mac_address
-        self.distance = distance
 
-keys = []
 devices = {}
-seenDevices = set()
-
 server_url = "https://2b6a-31-205-125-227.ngrok-free.app"
 
 def get_all_mac_addresses():
@@ -48,13 +48,13 @@ def get_username_for_mac_address(mac_address):
         return "error"
 
 def get_all_usernames(list_mac_addresses):
-    usernames = []
+    usernames = {} # usernames assumed to be unique in an organisation
     filter_out = ["invalid", "error"]
     
     for mac in list_mac_addresses:
         username = get_username_for_mac_address(mac)
         if username not in filter_out:
-            usernames.append(username)
+            usernames[username] = mac
 
     return usernames
 
@@ -69,6 +69,7 @@ class ScanDelegate(DefaultDelegate):
             print("Device found:", dev.addr, "RSSI:", dev.rssi)
             mac_address = dev.addr
             devices[mac_address] = {}
+            devices[mac_address]['loggedIn'] = False
             distance = self.calculateDistance(dev.rssi)
             devices[mac_address]['distance'] = distance
             print(f"{mac_address} is " + str(distance) + "m away.")
@@ -76,11 +77,15 @@ class ScanDelegate(DefaultDelegate):
                 with Peripheral(mac_address) as peripheral:
                     print("Device is " + str(distance) + "m away.")
                     print("Connected.")
+
+                    # Set as the same service and characteristics for each device
                     service = peripheral.getServiceByUUID(SERVICE_UUID)
                     characteristic = service.getCharacteristics(CHARACTERISTIC_UUID)[0]
+
+                    # Value is the OTP key {key: Key, mac_address: mac_address}
                     value = characteristic.read().decode("utf-8")
                     print(f"Value: {value}")
-                    seenDevices.add(mac_address)
+
                     devices[mac_address]['value'] = json.loads(value)
                     peripheral.disconnect()
                     print("Disconnected.")
@@ -115,19 +120,30 @@ def scan_devices():
 
             # get all usernames for each device via mac address from server
             all_usernames = get_all_usernames(within_range_mac_addresses)
-            print(f"all_usernames: {all_usernames}")
+            print(f"all_usernames: {all_usernames.keys()}")
             
             # send list of usernames to facial recog script
-            main_loop(all_usernames)
+            user_found = main_loop(all_usernames.keys())
+            if user_found is not None:
+                # TODO: Get the credentials and send to RPi Pico
 
-            # if any username is recognised, send via GPIO to RPi Pico
+
+                # Set user as logged in on the RPi interface
+                devices[all_usernames[user_found]]['loggedIn'] = True
+                devices[all_usernames[user_found]]['name'] = user_found
+                pass
 
     except KeyboardInterrupt:
         scanner.stop()
 
+
 @app.route('/api/devices', methods=['GET'])
 def get_devices():
-    return jsonify(devices)
+    users = []
+    for device in devices:
+        users.append({"name": devices[device]['name'], "distance":devices[device]['distance'],"loggedIn": devices[device]['loggedIn'] })
+    validated_users = [User(**user).dict() for user in users]
+    return jsonify(validated_users)
 
 if __name__ == '__main__':
     scan_thread = Thread(target=scan_devices)
