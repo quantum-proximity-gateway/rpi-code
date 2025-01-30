@@ -20,7 +20,7 @@ export default function Home() {
   const [users, setUsers] = useState<User[]>([]);
 
   async function getUserData(): Promise<User[]> {
-    // const response = await fetch("http://localhost:8000/api/users");
+    // const response = await fetch("http://localhost:8000/api/devices");
     // const data = await response.json();
     // return data;
 
@@ -39,7 +39,7 @@ export default function Home() {
     // Call API every half second to update the user data
     const interval = setInterval(() => {
       getUserData().then(data => setUsers(data));
-    }, 1000);
+    }, 500);
 
     return () => clearInterval(interval);
   }, []);
@@ -60,7 +60,7 @@ export default function Home() {
         return (
           <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: "5px"}}>
             <p>{user.name}</p>
-            <div key={user.name} style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", width: `${circleSize}px`, height: `${circleSize}px`, backgroundColor: user.loggedIn ? "blue" : user.distance < 3 ? "green" : "red", borderRadius: "50%", overflow: "hidden", whiteSpace: "nowrap"}}>
+            <div key={user.name} style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", width: `${circleSize}px`, height: `${circleSize}px`, border:`3px solid ${user.loggedIn ? "blue" : user.distance < 3 ? "green" : "red"}`, borderRadius: "50%", overflow: "hidden", whiteSpace: "nowrap"}}>
               <p>{user.distance.toFixed(2)}m</p>
               {user.loggedIn && <p>Logged In</p>}
             </div>

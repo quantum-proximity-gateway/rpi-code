@@ -1,9 +1,12 @@
 from bluepy.btle import DefaultDelegate, Scanner, Peripheral
 from time import sleep
+from threading import Thread
+from flask import Flask, jsonify
 import json
 import requests
 from recognise import main_loop
 
+app = Flask(__name__)
 
 SERVICE_UUID = "2246ef74-f912-417f-8530-4a7df291d584"
 CHARACTERISTIC_UUID = "a3445e11-5bff-4d2a-a3b1-b127f9567bb6"
@@ -55,8 +58,6 @@ def get_all_usernames(list_mac_addresses):
 
     return usernames
 
-addresses = set(get_all_mac_addresses())
-
 class ScanDelegate(DefaultDelegate):
     def __init__(self):
         DefaultDelegate.__init__(self)
@@ -97,27 +98,38 @@ class ScanDelegate(DefaultDelegate):
             N = Constant from 2-4 depending on Signal Strength
         '''
         return 10 ** ((-40-int(rssi))/(10*4))
+    
+def scan_devices():
+    global addresses
+    addresses = set(get_all_mac_addresses())
+    try:
+        while True:
+            scanner = Scanner().withDelegate(ScanDelegate())
+            print('Scanning for devices...')
+            scanner.start(passive=True)
+            scanner.process(timeout=5)
 
-try:
-    while True:
-        scanner = Scanner().withDelegate(ScanDelegate())
-        print('Scanning for devices...')
-        scanner.start(passive=True)
-        scanner.process(timeout=5)
+            # filter devices by 3m or less
+            within_range_mac_addresses = [mac for mac in devices if devices[mac]['distance'] <= 3]
+            print(f"within_range_mac_addresses: {within_range_mac_addresses}")
 
-        # filter devices by 3m or less
-        within_range_mac_addresses = [mac for mac in devices if devices[mac]['distance'] <= 3]
-        print(f"within_range_mac_addresses: {within_range_mac_addresses}")
-
-        # get all usernames for each device via mac address from server
-        all_usernames = get_all_usernames(within_range_mac_addresses)
-        print(f"all_usernames: {all_usernames}")
-        
-        # send list of usernames to facial recog script
-        main_loop(all_usernames)
+            # get all usernames for each device via mac address from server
+            all_usernames = get_all_usernames(within_range_mac_addresses)
+            print(f"all_usernames: {all_usernames}")
             
+            # send list of usernames to facial recog script
+            main_loop(all_usernames)
 
-        # if any username is recognised, return username
+            # if any username is recognised, send via GPIO to RPi Pico
 
-except KeyboardInterrupt:
-    scanner.stop()
+    except KeyboardInterrupt:
+        scanner.stop()
+
+@app.route('/api/devices', methods=['GET'])
+def get_devices():
+    return jsonify(devices)
+
+if __name__ == '__main__':
+    scan_thread = Thread(target=scan_devices)
+    scan_thread.start()
+    app.run(host='0.0.0.0', port=5000)
