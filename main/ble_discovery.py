@@ -2,13 +2,14 @@ from bluepy.btle import DefaultDelegate, Scanner, Peripheral
 from time import sleep
 from threading import Thread
 from flask import Flask, jsonify
+from flask_cors import CORS
 import json
 import requests
 from recognise import main_loop
 from pydantic import BaseModel
 
 app = Flask(__name__)
-
+CORS(app)
 
 # Specific model needed by front-end
 class User(BaseModel):
@@ -68,7 +69,8 @@ class ScanDelegate(DefaultDelegate):
             print("Device is " + str(distance) + "m away.")
             print("Device found:", dev.addr, "RSSI:", dev.rssi)
             mac_address = dev.addr
-            devices[mac_address] = {}
+            if mac_address not in devices:
+                devices[mac_address] = {}
             devices[mac_address]['loggedIn'] = False
             distance = self.calculateDistance(dev.rssi)
             devices[mac_address]['distance'] = distance
@@ -125,13 +127,16 @@ def scan_devices():
             # send list of usernames to facial recog script
             user_found = main_loop(all_usernames.keys())
             if user_found is not None:
+                print("goes here")
                 # TODO: Get the credentials and send to RPi Pico
 
-
+                print(f"devices before: {devices}")
+                
                 # Set user as logged in on the RPi interface
                 devices[all_usernames[user_found]]['loggedIn'] = True
                 devices[all_usernames[user_found]]['name'] = user_found
-                pass
+
+                print(f"devices after: {devices}")
 
     except KeyboardInterrupt:
         scanner.stop()
@@ -142,6 +147,7 @@ def get_devices():
     print(devices)
     users = []
     for device in devices:
+        print(f"device: {device}")
         users.append({"name": devices[device]['name'], "distance":devices[device]['distance'],"loggedIn": devices[device]['loggedIn'] })
     validated_users = [User(**user).dict() for user in users]
     return jsonify(validated_users)

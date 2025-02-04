@@ -20,17 +20,17 @@ export default function Home() {
   const [users, setUsers] = useState<User[]>([]);
 
   async function getUserData(): Promise<User[]> {
-    // const response = await fetch("http://localhost:8000/api/devices");
-    // const data = await response.json();
-    // return data;
+    const response = await fetch("http://localhost:5000/api/devices");
+    const data = await response.json();
+    return data;
 
     // Placeholder data
-    const data: User[] = [
-      { name: "Alice", distance: 0, loggedIn: false },
-      { name: "Bob", distance: Math.random()*10, loggedIn: true },
-      { name: "Charlie", distance: Math.random()*10, loggedIn: false },
-      { name: "Dale", distance: Math.random()*10, loggedIn: false },
-    ];
+    // const data: User[] = [
+    //   { name: "Alice", distance: 0, loggedIn: false },
+    //   { name: "Bob", distance: Math.random()*10, loggedIn: true },
+    //   { name: "Charlie", distance: Math.random()*10, loggedIn: false },
+    //   { name: "Dale", distance: Math.random()*10, loggedIn: false },
+    // ];
     // Simulate API response delay
     return new Promise(resolve => setTimeout(() => resolve(data), 100));
   }
