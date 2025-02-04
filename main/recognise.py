@@ -89,7 +89,6 @@ def calculate_fps():
     return fps
 
 def main_loop(list_of_names):
-
     if len(sys.argv) <= 0:
         print("must have 1 or more names searching for")
     else:
