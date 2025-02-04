@@ -21,7 +21,7 @@ CHARACTERISTIC_UUID = "a3445e11-5bff-4d2a-a3b1-b127f9567bb6"
 
 
 devices = {}
-server_url = "https://2b6a-31-205-125-227.ngrok-free.app"
+server_url = "https://bf6c-144-82-8-152.ngrok-free.app"
 
 def get_all_mac_addresses():
     try:
@@ -139,6 +139,7 @@ def scan_devices():
 
 @app.route('/api/devices', methods=['GET'])
 def get_devices():
+    print(devices)
     users = []
     for device in devices:
         users.append({"name": devices[device]['name'], "distance":devices[device]['distance'],"loggedIn": devices[device]['loggedIn'] })
