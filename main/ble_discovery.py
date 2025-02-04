@@ -96,8 +96,6 @@ class ScanDelegate(DefaultDelegate):
             finally:
                 sleep(1)
         
-
-    
     def calculateDistance(self, rssi):
         '''
             Distance = 10 ^ ((Measured Power -RSSI)/(10 * N))
