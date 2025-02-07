@@ -1,7 +1,7 @@
 import time
-import machine
 import json
 import board
+import busio
 import digitalio
 import usb_hid
 from adafruit_hid.keyboard import Keyboard
@@ -9,7 +9,7 @@ from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keycode import Keycode
 
 # Initialize UART0 with baud rate 9600
-uart = machine.UART(0, baudrate=9600)
+uart = busio.UART(board.GP0, board.GP1 ,baudrate=9600)
 
 # Function to send data over UART
 def send_data(data):
@@ -17,8 +17,10 @@ def send_data(data):
 
 # Function to receive data over UART
 def receive_data():
-    if uart.any():
-        return json.loads(uart.read().decode('utf-8')) # parse json
+    if uart.in_waiting > 0:
+        data = uart.read(uart.in_waiting).decode('utf-8')
+        print("DATA:" + data)
+        return json.loads(data) # parse json
     return None
 
 def parse_response(response):
