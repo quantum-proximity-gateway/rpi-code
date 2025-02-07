@@ -1,6 +1,6 @@
 import time
 import machine
-import python
+import json
 import board
 import digitalio
 import usb_hid
@@ -18,7 +18,7 @@ def send_data(data):
 # Function to receive data over UART
 def receive_data():
     if uart.any():
-        return uart.read().decode('utf-8')
+        return json.loads(uart.read().decode('utf-8')) # parse json
     return None
 
 def parse_response(response):
