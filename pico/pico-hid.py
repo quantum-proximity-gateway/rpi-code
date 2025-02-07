@@ -1,5 +1,6 @@
 import time
 import machine
+import python
 import board
 import digitalio
 import usb_hid
@@ -20,8 +21,15 @@ def receive_data():
         return uart.read().decode('utf-8')
     return None
 
-username = "Marwan"
-password = "helloworld"
+def parse_response(response):
+    if 'username' in response and 'password' in response:
+        return response['username'], response['password']
+    return None, None
+
+'''
+    username = "Marwan"
+    password = "helloworld"
+'''
 
 led = digitalio.DigitalInOut(board.LED)
 led.direction = digitalio.Direction.OUTPUT
@@ -32,15 +40,17 @@ keyboard_layout = KeyboardLayoutUS(keyboard)
 while True:
     response = receive_data()
     if response:
-        led.value = True
-        keyboard_layout.write(username)
-        led.value = False
-        keyboard.press(Keycode.ENTER)
-        keyboard.release_all()
-        time.sleep(2)
-        led.value = True
-        keyboard_layout.write(password)
-        led.value = False
-        keyboard.press(Keycode.ENTER)
-        keyboard.release_all()
-        time.sleep(1)
+        username, password = parse_response(response)
+        if username and password:
+            led.value = True
+            keyboard_layout.write(username)
+            led.value = False
+            keyboard.press(Keycode.ENTER)
+            keyboard.release_all()
+            time.sleep(2)
+            led.value = True
+            keyboard_layout.write(password)
+            led.value = False
+            keyboard.press(Keycode.ENTER)
+            keyboard.release_all()
+            time.sleep(1)
