@@ -1,6 +1,7 @@
 import serial
+import time
 
 ser = serial.Serial('/dev/ttyAMA0') # /dev/ttyS3 for UART3 (help...)
-ser.write(b'username\n') # send username
-ser.write(b'password\n') # send password
-ser.close()
+while True:
+    print(ser.read(5))
+    time.sleep(0.1)
