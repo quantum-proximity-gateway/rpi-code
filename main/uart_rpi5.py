@@ -1,7 +1,14 @@
 import serial
 import time
 
-ser = serial.Serial('/dev/ttyAMA0', timeout=1) # /dev/ttyS3 for UART3 (help...)
-while True:
-    print(ser.read(5))
-    time.sleep(0.1)
+ser = serial.Serial('/dev/ttyAMA0', baudrate=9600, timeout=1) # Specify baud rate and timeout
+
+try:
+    while True:
+        ser.write(b'Hello, UART!\n')  # Send data
+        time.sleep(1)  # Wait for a second before sending the next message
+except serial.SerialException as e:
+    print(f"Error: {e}")
+finally:
+    if ser.is_open:
+        ser.close()
