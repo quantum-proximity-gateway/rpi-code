@@ -8,8 +8,8 @@ from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keycode import Keycode
 
-# Initialize UART0 with baud rate 9600
-uart = busio.UART(board.GP0, board.GP1 ,baudrate=9600)
+# Initialize UART0 with baud rate 115200
+uart = busio.UART(board.GP0, board.GP1 ,baudrate=115200, timeout=1)
 
 # Function to send data over UART
 def send_data(data):
@@ -44,7 +44,7 @@ keyboard = Keyboard(usb_hid.devices)
 keyboard_layout = KeyboardLayoutUS(keyboard)
 
 while True:
-    send_data('hello')
+    send_data('hello\r\n')
     response = receive_data()
     if response:
         username, password = parse_response(response)
