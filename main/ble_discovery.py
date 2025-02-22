@@ -154,3 +154,4 @@ if __name__ == '__main__':
     scan_thread = Thread(target=scan_devices)
     scan_thread.start()
     app.run(host='0.0.0.0', port=5000)
+# https://prod.liveshare.vsengsaas.visualstudio.com/join?E4D365FE5CB55AE8BF230FB790BA5E17D550
