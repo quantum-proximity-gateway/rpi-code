@@ -17,12 +17,13 @@ class User(BaseModel):
     distance: float
     loggedIn: bool
 
+
 SERVICE_UUID = "2246ef74-f912-417f-8530-4a7df291d584"
 CHARACTERISTIC_UUID = "a3445e11-5bff-4d2a-a3b1-b127f9567bb6"
 
 
 devices = {}
-server_url = "https://bf6c-144-82-8-152.ngrok-free.app"
+server_url = "https://7f0f-31-205-125-238.ngrok-free.app"
 
 def get_all_mac_addresses():
     try:
@@ -127,7 +128,7 @@ def scan_devices():
             if user_found is not None:
                 print("goes here")
                 # TODO: Get the credentials and send to RPi Pico
-
+                print("USER FOUND:", user_found)
                 print(f"devices before: {devices}")
                 
                 # Set user as logged in on the RPi interface
@@ -154,4 +155,5 @@ if __name__ == '__main__':
     scan_thread = Thread(target=scan_devices)
     scan_thread.start()
     app.run(host='0.0.0.0', port=5000)
-# https://prod.liveshare.vsengsaas.visualstudio.com/join?E4D365FE5CB55AE8BF230FB790BA5E17D550
+
+# https://prod.liveshare.vsengsaas.visualstudio.com/join?F90D5A054A593F9B4EFFAF49EF458BF4ABA4
