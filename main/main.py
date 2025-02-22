@@ -86,7 +86,11 @@ class ScanDelegate(DefaultDelegate):
             mac_address = dev.addr
             if mac_address not in devices:
                 devices[mac_address] = {}
-            devices[mac_address]['loggedIn'] = False
+            if 'loggedIn' not in devices[mac_address]:
+                devices[mac_address]['loggedIn'] = False
+            if devices[mac_address]['loggedIn'] and distance > 3: # Log out user when gone
+                devices[mac_address]['loggedIn'] = False
+
             distance = self.calculateDistance(dev.rssi)
             devices[mac_address]['distance'] = distance
             print(f"{mac_address} is " + str(distance) + "m away.")
@@ -135,13 +139,20 @@ def scan_devices():
 
             # get all usernames for each device via mac address from server
             all_usernames = get_all_usernames(within_range_mac_addresses)
-            print(f"all_usernames: {all_usernames.keys()}")
-            
+        
+            # Do not check for users already logged in - wastes time
+            filtered_users = []
+            for username in all_usernames:  
+                mac_add = all_usernames[username]
+                devices[mac_add]['name'] = username
+                if not devices[mac_add]['loggedIn']:
+                    filtered_users.append(username)
+
             # send list of usernames to facial recog script
-            user_found = main_loop(all_usernames.keys())
+            user_found = main_loop(filtered_users)
             if user_found is not None:
-                print("goes here")
-                # TODO: Get the credentials and send to RPi Pico
+                print("Sending credentials")
+                
                 
                 username, password = get_credentials(all_usernames[user_found])
                 uart_rpi5.write_to_pico(username, password)

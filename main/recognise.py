@@ -90,42 +90,42 @@ def calculate_fps():
 def main_loop(list_of_names):
 
     print('Facial recognition stage')
-    if len(sys.argv) <= 0:
-        print("must have 1 or more names searching for")
-    else:
-        start_time_loop = time.time()
-        while time.time() - start_time_loop < 10:
-            # Capture a frame from camera
-            frame = picam2.capture_array()
-            person_found = False
-            # Process the frame with the function
-            processed_frame = None
-            for name in list_of_names:
-                processed_frame, person_checking_found = process_frame(frame, name)
-                if person_checking_found:
-                    person_found = True
-                    print(name, "was found.")
-                    return name
-            '''
-            Code for displaying face, not needed currently.
-            '''
-            if person_found:
-                 # # Get the text and boxes to be drawn based on the processed frame
-                display_frame = draw_results(processed_frame)
-        
-            # Calculate and update FPS
-                current_fps = calculate_fps()
-        
-            # Attach FPS counter to the text and boxes
-                cv2.putText(display_frame, f"FPS: {current_fps:.1f}", (display_frame.shape[1] - 150, 30), 
-                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        
-            # Display everything over the video feed.
-                cv2.imshow('Video', display_frame)
+    if len(list_of_names) == 0:
+        return None
+    
+    start_time_loop = time.time()
+    while time.time() - start_time_loop < 2:
+        # Capture a frame from camera
+        frame = picam2.capture_array()
+        person_found = False
+        # Process the frame with the function
+        processed_frame = None
+        for name in list_of_names:
+            processed_frame, person_checking_found = process_frame(frame, name)
+            if person_checking_found:
+                person_found = True
+                print(name, "was found.")
+                return name
+        '''
+        Code for displaying face, not needed currently.
+        '''
+        if person_found:
+                # # Get the text and boxes to be drawn based on the processed frame
+            display_frame = draw_results(processed_frame)
+    
+        # Calculate and update FPS
+            current_fps = calculate_fps()
+    
+        # Attach FPS counter to the text and boxes
+            cv2.putText(display_frame, f"FPS: {current_fps:.1f}", (display_frame.shape[1] - 150, 30), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    
+        # Display everything over the video feed.
+            cv2.imshow('Video', display_frame)
 
-                if cv2.waitKey(1) == ord("q"):
-                    break
-        cv2.destroyAllWindows()
+            if cv2.waitKey(1) == ord("q"):
+                break
+    cv2.destroyAllWindows()
     
        
 
