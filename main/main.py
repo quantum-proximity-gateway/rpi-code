@@ -3,6 +3,7 @@ from time import sleep
 from threading import Thread
 from flask import Flask, jsonify
 from flask_cors import CORS
+import time
 import json
 import requests
 import uart_rpi5
@@ -22,8 +23,13 @@ class User(BaseModel):
 SERVICE_UUID = "2246ef74-f912-417f-8530-4a7df291d584"
 CHARACTERISTIC_UUID = "a3445e11-5bff-4d2a-a3b1-b127f9567bb6"
 
+# Security parameters to be tweaked by system administators
+TIMEOUT_LIMIT = 60
+DISTANCE_LIMIT = 3
+
 
 devices = {}
+logged_in = None
 server_url = "https://7f0f-31-205-125-238.ngrok-free.app"
 
 def get_all_mac_addresses():
@@ -86,11 +92,13 @@ class ScanDelegate(DefaultDelegate):
             mac_address = dev.addr
             if mac_address not in devices:
                 devices[mac_address] = {}
+            devices[mac_address]['last_seen'] = time.time() # Timestamp for all devices
             if 'loggedIn' not in devices[mac_address]:
                 devices[mac_address]['loggedIn'] = False
-            if devices[mac_address]['loggedIn'] and distance > 3: # Log out user when gone
+            if devices[mac_address]['loggedIn'] and distance > DISTANCE_LIMIT: # Log out user when gone (distance 3m>)
                 devices[mac_address]['loggedIn'] = False
-
+            
+            
             distance = self.calculateDistance(dev.rssi)
             devices[mac_address]['distance'] = distance
             print(f"{mac_address} is " + str(distance) + "m away.")
@@ -124,20 +132,26 @@ class ScanDelegate(DefaultDelegate):
         return 10 ** ((-40-int(rssi))/(10*4))
     
 def scan_devices():
-    global addresses
+    global addresses, logged_in
+
     addresses = set(get_all_mac_addresses())
     try:
         while True:
             scanner = Scanner().withDelegate(ScanDelegate())
             print('Scanning for devices...')
             scanner.start(passive=True)
-            scanner.process(timeout=5)
+            scanner.process(timeout=1)
+
+            for device in devices:
+                if time.time() - devices[device]['last_seen'] > TIMEOUT_LIMIT: # Delete user if not seen in the last 60 seconds
+                    print(device, "has dissapeared.")
+                    del devices[device]
 
             # filter devices by 3m or less
             within_range_mac_addresses = [mac for mac in devices if devices[mac]['distance'] <= 3]
             print(f"within_range_mac_addresses: {within_range_mac_addresses}")
 
-            # get all usernames for each device via mac address from server
+            # get all usernames for each device via mac address from server {username: mac_address}
             all_usernames = get_all_usernames(within_range_mac_addresses)
         
             # Do not check for users already logged in - wastes time
@@ -161,6 +175,7 @@ def scan_devices():
                 
                 # Set user as logged in on the RPi interface
                 devices[all_usernames[user_found]]['loggedIn'] = True
+                logged_in = all_usernames[user_found]
                 devices[all_usernames[user_found]]['name'] = user_found
 
                 print(f"devices after: {devices}")
@@ -168,7 +183,11 @@ def scan_devices():
     except KeyboardInterrupt:
         scanner.stop()
 
+'''
+marwan
+hello
 
+'''
 @app.route('/api/devices', methods=['GET'])
 def get_devices():
     print(devices)

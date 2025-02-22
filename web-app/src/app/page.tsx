@@ -32,7 +32,7 @@ export default function Home() {
     //   { name: "Dale", distance: Math.random()*10, loggedIn: false },
     // ];
     // Simulate API response delay
-    return new Promise(resolve => setTimeout(() => resolve(data), 100));
+    return new Promise(resolve => setTimeout(() => resolve(data), 1000)); // 1 second to match scanning timeout
   }
 
   useEffect(() => {
