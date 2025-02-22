@@ -8,23 +8,24 @@ from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keycode import Keycode
 
-# Initialize UART0 with baud rate 115200
-uart = busio.UART(board.GP0, board.GP1 ,baudrate=115200, timeout=1)
+# Initialize UART0 with baud rate 9600
+uart = busio.UART(board.GP0, board.GP1 ,baudrate=9600)
 
-# Function to send data over UART
+# Function to send data over UART (FOR DEBUGGING ONLY)
 def send_data(data):
     uart.write(data)
     print('Sent: ' + data)
 
 # Function to receive data over UART
 def receive_data():
+    data = "Nothing"
     if uart.in_waiting > 0:
         data = uart.read(uart.in_waiting).decode('utf-8')
-        print("DATA:" + data)
         try:
             return json.loads(data) # parse json
         except:
             print('invalid data')
+    print("DATA:" + data)
     return None
 
 def parse_response(response):
@@ -33,8 +34,13 @@ def parse_response(response):
     return None, None
 
 '''
-    username = "Marwan"
-    password = "helloworld"
+
+JSON Format
+
+{
+    username = ""
+    password = ""
+}
 '''
 
 led = digitalio.DigitalInOut(board.LED)
@@ -44,9 +50,9 @@ keyboard = Keyboard(usb_hid.devices)
 keyboard_layout = KeyboardLayoutUS(keyboard)
 
 while True:
-    send_data('hello\r\n')
     response = receive_data()
     if response:
+        led.value = True
         username, password = parse_response(response)
         if username and password:
             led.value = True
@@ -61,4 +67,5 @@ while True:
             keyboard.press(Keycode.ENTER)
             keyboard.release_all()
             time.sleep(1)
+    led.value = False
     time.sleep(1)

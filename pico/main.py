@@ -1,7 +1,7 @@
 import machine
 import time
 
-uart = machine.UART(0, tx=machine.Pin(0), rx=machine.Pin(1), baudrate=115200)
+uart = machine.UART(0, tx=machine.Pin(0), rx=machine.Pin(1), baudrate=9600)
 led = machine.Pin("LED", machine.Pin.OUT)
 
 print("Pico UART Initialised")
