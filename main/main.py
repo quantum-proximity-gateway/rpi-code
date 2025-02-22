@@ -5,6 +5,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 import json
 import requests
+import uart_rpi5
 from recognise import main_loop
 from pydantic import BaseModel
 
@@ -36,6 +37,19 @@ def get_all_mac_addresses():
     except requests.exceptions.RequestException as e:
         print(f"Error occurred while fetching MAC addresses: {e}")
         return []
+ 
+def get_credentials(mac_address): #TODO: Change to be used only when key validated
+    try:
+        response = requests.get(f"{server_url}/devices/{mac_address}/credentials")
+        response.raise_for_status()
+        data = response.json()
+
+        return data.get("username", "invalid"), data.get("password", "invalid")
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching username for MAC address {mac_address}: {e}")
+        return "error"
+
 
 def get_username_for_mac_address(mac_address):
     try:
@@ -128,7 +142,10 @@ def scan_devices():
             if user_found is not None:
                 print("goes here")
                 # TODO: Get the credentials and send to RPi Pico
-                print("USER FOUND:", user_found)
+                
+                username, password = get_credentials(all_usernames[user_found])
+                uart_rpi5.write_to_pico(username, password)
+
                 print(f"devices before: {devices}")
                 
                 # Set user as logged in on the RPi interface
