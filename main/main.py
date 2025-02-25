@@ -21,7 +21,7 @@ def reload_encoding():
     # Load pre-trained face encodings
     print("[INFO] loading encodings...")
     print(os.listdir())
-    with open("main/encodings.pickle", "rb") as f:
+    with open("encodings.pickle", "rb") as f:
         data = pickle.loads(f.read())
 
 app = Flask(__name__)
