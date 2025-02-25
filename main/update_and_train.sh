@@ -33,9 +33,9 @@ else
   echo "Local repository is up-to-date with origin/$BRANCH."
 fi
 
-face_rec/bin/python main/train_model.py
+main/face_rec/bin/python3 main/train_model.py
 echo "Running train_model.py..."
-g
+
 # To schedule this script to run automatically, add a new cron job by running `crontab -e`, and paste the following at the end:
 #
 # ```
