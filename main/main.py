@@ -183,11 +183,6 @@ def scan_devices():
     except KeyboardInterrupt:
         scanner.stop()
 
-'''
-marwan
-hello
-
-'''
 @app.route('/api/devices', methods=['GET'])
 def get_devices():
     print(devices)
