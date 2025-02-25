@@ -4,11 +4,25 @@ from threading import Thread
 from flask import Flask, jsonify
 from flask_cors import CORS
 import time
+import subprocess
 import json
 import requests
+import os
 import uart_rpi5
-from recognise import main_loop
+from recognise import FaceRecognizer
 from pydantic import BaseModel
+import pickle
+
+
+data = None
+
+def reload_encoding():
+    global data
+    # Load pre-trained face encodings
+    print("[INFO] loading encodings...")
+    print(os.listdir())
+    with open("encodings.pickle", "rb") as f:
+        data = pickle.loads(f.read())
 
 app = Flask(__name__)
 CORS(app)
@@ -163,10 +177,11 @@ def scan_devices():
                     filtered_users.append(username)
 
             # send list of usernames to facial recog script
-            user_found = main_loop(filtered_users)
+            face_recognizer = FaceRecognizer(data)
+            user_found = face_recognizer.main_loop(filtered_users)
+
             if user_found is not None:
                 print("Sending credentials")
-                
                 
                 username, password = get_credentials(all_usernames[user_found])
                 uart_rpi5.write_to_pico(username, password)
@@ -183,6 +198,18 @@ def scan_devices():
     except KeyboardInterrupt:
         scanner.stop()
 
+
+def check_updates():
+    while True:
+        current_dir = os.path.dirname(__file__)
+        script_path = os.path.join(current_dir, 'scripts', 'update_and_train.sh')
+        result = subprocess.run(['bash', script_path], capture_output=True, text=True)
+        print(result.stdout)
+        if len(result.stdout > 0):
+            reload_encoding()
+        print(result.stderr)
+        sleep(60)
+
 @app.route('/api/devices', methods=['GET'])
 def get_devices():
     print(devices)
@@ -196,6 +223,8 @@ def get_devices():
 if __name__ == '__main__':
     scan_thread = Thread(target=scan_devices)
     scan_thread.start()
+    bash_thread = Thread(target=check_updates)
+    bash_thread.start()
     app.run(host='0.0.0.0', port=5000)
 
 # https://prod.liveshare.vsengsaas.visualstudio.com/join?F90D5A054A593F9B4EFFAF49EF458BF4ABA4
