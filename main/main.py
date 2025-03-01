@@ -52,6 +52,7 @@ def get_all_mac_addresses():
     try:
         response = requests.get(f"{server_url}/devices/all-mac-addresses")
         response.raise_for_status()
+        
         mac_addresses = response.json()
 
         return [mac.strip() for mac in mac_addresses]
