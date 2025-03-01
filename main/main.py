@@ -12,6 +12,7 @@ import uart_rpi5
 from recognise import FaceRecognizer
 from pydantic import BaseModel
 import pickle
+from encryption_client import EncryptionClient
 
 
 data = None
