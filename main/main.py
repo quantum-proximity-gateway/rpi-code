@@ -14,7 +14,6 @@ from pydantic import BaseModel
 import pickle
 from encryption_client import EncryptionClient
 
-
 data = None
 
 def reload_encoding():
@@ -27,6 +26,7 @@ def reload_encoding():
 
 app = Flask(__name__)
 CORS(app)
+
 
 # Specific model needed by front-end
 class User(BaseModel):
@@ -42,10 +42,11 @@ CHARACTERISTIC_UUID = "a3445e11-5bff-4d2a-a3b1-b127f9567bb6"
 TIMEOUT_LIMIT = 60
 DISTANCE_LIMIT = 3
 
-
 devices = {}
 logged_in = None
 server_url = "https://f3a2-144-82-8-84.ngrok-free.app"
+
+encryptionClient = EncryptionClient(server_url)
 
 def get_all_mac_addresses():
     try:

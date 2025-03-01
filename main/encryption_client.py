@@ -59,12 +59,14 @@ class EncryptionClient():
 
         return data
 
-    def decrypt_request(data: EncryptedResponse, self) -> dict: # pass in response.json()
-        if not data.nonce_b64 or not data.ciphertext_b64:
-            raise RuntimeError('Missing parameters in response.')
+    def decrypt_request(data: dict, self) -> dict: # pass in response.json()
+        try:
+            validated_data = EncryptedResponse(**data)
+        except ValueError as e:
+            raise RuntimeError(f'Invalid response data: {e}')
         
         try:
-            plaintext = aesgcm_decrypt(data.nonce_b64, data.ciphertext_b64, self.shared_secret)
+            plaintext = aesgcm_decrypt(validated_data.nonce_b64, validated_data.ciphertext_b64, self.shared_secret)
             return plaintext
         except Exception as e:
             raise RuntimeError(f'Error: {e}\nFailed to decrypt response data.')
