@@ -6,6 +6,10 @@ import time
 import sys
 import os
 
+picam2 = Picamera2()
+picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (1280, 720)}))
+picam2.start()
+
 class FaceRecognizer:
     def __init__(self, data, cv_scaler=8):
         self.known_face_encodings = data["encodings"]
@@ -13,9 +17,7 @@ class FaceRecognizer:
         self.cv_scaler = cv_scaler
 
         # Initialize the camera
-        self.picam2 = Picamera2()
-        self.picam2.configure(self.picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (1280, 720)}))
-        self.picam2.start()
+        
 
         # Initialize other variables
         self.face_locations = []
@@ -78,7 +80,7 @@ class FaceRecognizer:
         
         start_time_loop = time.time()
         while time.time() - start_time_loop < 2:
-            frame = self.picam2.capture_array()
+            frame = picam2.capture_array()
             person_found = False
             processed_frame = None
 

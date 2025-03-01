@@ -45,7 +45,7 @@ DISTANCE_LIMIT = 3
 
 devices = {}
 logged_in = None
-server_url = "https://7f0f-31-205-125-238.ngrok-free.app"
+server_url = "https://f3a2-144-82-8-84.ngrok-free.app"
 
 def get_all_mac_addresses():
     try:
@@ -203,10 +203,10 @@ def scan_devices():
 def check_updates():
     while True:
         current_dir = os.path.dirname(__file__)
-        script_path = os.path.join(current_dir, 'scripts', 'update_and_train.sh')
+        script_path = os.path.join(current_dir, 'update_and_train.sh')
         result = subprocess.run(['bash', script_path], capture_output=True, text=True)
         print(result.stdout)
-        if len(result.stdout > 0):
+        if len(result.stdout) > 0:
             reload_encoding()
         print(result.stderr)
         sleep(60)
@@ -222,6 +222,7 @@ def get_devices():
     return jsonify(validated_users)
 
 if __name__ == '__main__':
+    reload_encoding()
     scan_thread = Thread(target=scan_devices)
     scan_thread.start()
     bash_thread = Thread(target=check_updates)
