@@ -61,9 +61,9 @@ def get_all_mac_addresses():
         print(f"Error occurred while fetching MAC addresses: {e}")
         return []
  
-def get_credentials(mac_address): #TODO: Change to be used only when key validated
+def get_credentials(mac_address: str): #TODO: Change to be used only when key validated
     try:
-        response = requests.get(f"{server_url}/devices/{mac_address}/credentials")
+        response = requests.get(f"{server_url}/devices/{mac_address}/credentials", params={'client_id': encryptionClient.CLIENT_ID})
         response.raise_for_status()
         data = encryptionClient.decrypt_request(response.json())
 
@@ -74,7 +74,7 @@ def get_credentials(mac_address): #TODO: Change to be used only when key validat
         return "error"
 
 
-def get_username_for_mac_address(mac_address):
+def get_username_for_mac_address(mac_address: str):
     try:
         response = requests.get(f"{server_url}/devices/{mac_address}/username", params={'client_id': encryptionClient.CLIENT_ID})
         response.raise_for_status()
@@ -86,7 +86,7 @@ def get_username_for_mac_address(mac_address):
         print(f"Error fetching username for MAC address {mac_address}: {e}")
         return "error"
 
-def get_all_usernames(list_mac_addresses):
+def get_all_usernames(list_mac_addresses: list):
     usernames = {} # usernames assumed to be unique in an organisation
     filter_out = ["invalid", "error"]
     
