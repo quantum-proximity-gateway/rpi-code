@@ -46,26 +46,24 @@ devices = {}
 logged_in = None
 server_url = "https://f3a2-144-82-8-84.ngrok-free.app"
 
-encryptionClient = EncryptionClient(server_url)
+encryption_client = EncryptionClient(server_url)
 
 def get_all_mac_addresses():
     try:
-        response = requests.get(f"{server_url}/devices/all-mac-addresses", params={'client_id': encryptionClient.CLIENT_ID})
+        response = requests.get(f"{server_url}/devices/all-mac-addresses", params={'client_id': encryption_client.CLIENT_ID})
         response.raise_for_status()
-        
-        mac_addresses = encryptionClient.decrypt_request(response.json())
-
-        return [mac.strip() for mac in mac_addresses]
-
+        response_json = response.json()
+        data = encryption_client.decrypt_request(response_json)
+        return [mac.strip() for mac in data['mac_addresses']]
     except requests.exceptions.RequestException as e:
         print(f"Error occurred while fetching MAC addresses: {e}")
         return []
  
 def get_credentials(mac_address: str): #TODO: Change to be used only when key validated
     try:
-        response = requests.get(f"{server_url}/devices/{mac_address}/credentials", params={'client_id': encryptionClient.CLIENT_ID})
+        response = requests.get(f"{server_url}/devices/{mac_address}/credentials", params={'client_id': encryption_client.CLIENT_ID})
         response.raise_for_status()
-        data = encryptionClient.decrypt_request(response.json())
+        data = encryption_client.decrypt_request(response.json())
 
         return data.get("username", "invalid"), data.get("password", "invalid")
 
@@ -76,9 +74,9 @@ def get_credentials(mac_address: str): #TODO: Change to be used only when key va
 
 def get_username_for_mac_address(mac_address: str):
     try:
-        response = requests.get(f"{server_url}/devices/{mac_address}/username", params={'client_id': encryptionClient.CLIENT_ID})
+        response = requests.get(f"{server_url}/devices/{mac_address}/username", params={'client_id': encryption_client.CLIENT_ID})
         response.raise_for_status()
-        data = encryptionClient.decrypt_request(response.json())
+        data = encryption_client.decrypt_request(response.json())
 
         return data.get("username", "invalid")
 
