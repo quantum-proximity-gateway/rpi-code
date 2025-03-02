@@ -3,6 +3,7 @@ import oqs
 import base64
 from aesgcm_encryption import aesgcm_encrypt, aesgcm_decrypt
 import uuid
+import json
 from pydantic import BaseModel
 
 class KEMException(Exception):
@@ -48,8 +49,10 @@ class EncryptionClient():
         
         return shared_secret
 
-    def encrypt_request(plaintext: str, self) -> dict:
-        nonce_b64, ciphertext_b64 = aesgcm_encrypt(plaintext, self.shared_secret)
+    def encrypt_request(self, plaintext: str) -> dict:
+        plaintext_str = json.dumps(plaintext)
+
+        nonce_b64, ciphertext_b64 = aesgcm_encrypt(plaintext_str, self.shared_secret)
 
         data = {
             'client_id': str(self.CLIENT_ID),
@@ -59,12 +62,14 @@ class EncryptionClient():
 
         return data
 
-    def decrypt_request(data: EncryptedResponse, self) -> dict: # pass in response.json()
-        if not data.nonce_b64 or not data.ciphertext_b64:
-            raise RuntimeError('Missing parameters in response.')
+    def decrypt_request(self, data: dict) -> dict: # pass in response.json()
+        try:
+            validated_data = EncryptedResponse(**data)
+        except ValueError as e:
+            raise RuntimeError(f'Invalid response data: {e}')
         
         try:
-            plaintext = aesgcm_decrypt(data.nonce_b64, data.ciphertext_b64, self.shared_secret)
-            return plaintext
+            plaintext = aesgcm_decrypt(validated_data.nonce_b64, validated_data.ciphertext_b64, self.shared_secret)
+            return json.loads(plaintext)
         except Exception as e:
             raise RuntimeError(f'Error: {e}\nFailed to decrypt response data.')

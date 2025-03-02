@@ -14,7 +14,6 @@ from pydantic import BaseModel
 import pickle
 from encryption_client import EncryptionClient
 
-
 data = None
 
 def reload_encoding():
@@ -27,6 +26,7 @@ def reload_encoding():
 
 app = Flask(__name__)
 CORS(app)
+
 
 # Specific model needed by front-end
 class User(BaseModel):
@@ -42,28 +42,28 @@ CHARACTERISTIC_UUID = "a3445e11-5bff-4d2a-a3b1-b127f9567bb6"
 TIMEOUT_LIMIT = 60
 DISTANCE_LIMIT = 3
 
-
 devices = {}
 logged_in = None
 server_url = "https://f3a2-144-82-8-84.ngrok-free.app"
 
+encryption_client = EncryptionClient(server_url)
+
 def get_all_mac_addresses():
     try:
-        response = requests.get(f"{server_url}/devices/all-mac-addresses")
+        response = requests.get(f"{server_url}/devices/all-mac-addresses", params={'client_id': encryption_client.CLIENT_ID})
         response.raise_for_status()
-        mac_addresses = response.json()
-
-        return [mac.strip() for mac in mac_addresses]
-
+        response_json = response.json()
+        data = encryption_client.decrypt_request(response_json)
+        return [mac.strip() for mac in data['mac_addresses']]
     except requests.exceptions.RequestException as e:
         print(f"Error occurred while fetching MAC addresses: {e}")
         return []
  
-def get_credentials(mac_address): #TODO: Change to be used only when key validated
+def get_credentials(mac_address: str): #TODO: Change to be used only when key validated
     try:
-        response = requests.get(f"{server_url}/devices/{mac_address}/credentials")
+        response = requests.get(f"{server_url}/devices/{mac_address}/credentials", params={'client_id': encryption_client.CLIENT_ID})
         response.raise_for_status()
-        data = response.json()
+        data = encryption_client.decrypt_request(response.json())
 
         return data.get("username", "invalid"), data.get("password", "invalid")
 
@@ -72,11 +72,11 @@ def get_credentials(mac_address): #TODO: Change to be used only when key validat
         return "error"
 
 
-def get_username_for_mac_address(mac_address):
+def get_username_for_mac_address(mac_address: str):
     try:
-        response = requests.get(f"{server_url}/devices/{mac_address}/username")
+        response = requests.get(f"{server_url}/devices/{mac_address}/username", params={'client_id': encryption_client.CLIENT_ID})
         response.raise_for_status()
-        data = response.json()
+        data = encryption_client.decrypt_request(response.json())
 
         return data.get("username", "invalid")
 
@@ -84,7 +84,7 @@ def get_username_for_mac_address(mac_address):
         print(f"Error fetching username for MAC address {mac_address}: {e}")
         return "error"
 
-def get_all_usernames(list_mac_addresses):
+def get_all_usernames(list_mac_addresses: list):
     usernames = {} # usernames assumed to be unique in an organisation
     filter_out = ["invalid", "error"]
     
