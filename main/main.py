@@ -50,7 +50,7 @@ encryptionClient = EncryptionClient(server_url)
 
 def get_all_mac_addresses():
     try:
-        response = requests.get(f"{server_url}/devices/all-mac-addresses")
+        response = requests.get(f"{server_url}/devices/all-mac-addresses", params={'client_id': encryptionClient.CLIENT_ID})
         response.raise_for_status()
         
         mac_addresses = encryptionClient.decrypt_request(response.json())
@@ -76,7 +76,7 @@ def get_credentials(mac_address): #TODO: Change to be used only when key validat
 
 def get_username_for_mac_address(mac_address):
     try:
-        response = requests.get(f"{server_url}/devices/{mac_address}/username")
+        response = requests.get(f"{server_url}/devices/{mac_address}/username", params={'client_id': encryptionClient.CLIENT_ID})
         response.raise_for_status()
         data = encryptionClient.decrypt_request(response.json())
 
