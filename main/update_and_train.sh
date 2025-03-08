@@ -13,7 +13,7 @@ fi
 
 GITHUB_USERNAME="quantum-proximity-gateway"
 REPO_NAME="rpi-code"
-BRANCH="main"
+BRANCH="images"
 
 GIT_REMOTE_URL="https://${GITHUB_AUTH_PULL_TOKEN}@github.com/${GITHUB_USERNAME}/${REPO_NAME}.git"
 
@@ -29,19 +29,8 @@ REMOTE_COMMIT=$(git rev-parse origin/"${BRANCH}")
 if [ "$LOCAL_COMMIT" != "$REMOTE_COMMIT" ]; then
   echo "Pulling latest changes from $BRANCH..."
   git pull origin "$BRANCH"
+  exit 0
 else
   echo "Local repository is up-to-date with origin/$BRANCH."
+  exit 1
 fi
-
-main/face_rec/bin/python3 main/train_model.py
-echo "Running train_model.py..."
-
-# To schedule this script to run automatically, add a new cron job by running `crontab -e`, and paste the following at the end:
-#
-# ```
-# */1 * * * * /path/to/repo/update_and_train.sh >> /path/to/repo/update.log 2>&1
-# ```
-#
-# This will:
-# - run the script every 1 minute
-# - log output to update.log for debugging

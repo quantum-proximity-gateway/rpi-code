@@ -10,6 +10,8 @@ import requests
 import os
 import uart_rpi5
 from recognise import FaceRecognizer
+import asyncio
+from train_model import model_training
 from pydantic import BaseModel
 import pickle
 from encryption_client import EncryptionClient
@@ -44,7 +46,7 @@ DISTANCE_LIMIT = 3
 
 devices = {}
 logged_in = None
-server_url = "https://f3a2-144-82-8-84.ngrok-free.app"
+server_url = "https://4deb-144-82-8-147.ngrok-free.app"
 
 encryption_client = EncryptionClient(server_url)
 
@@ -200,16 +202,39 @@ def scan_devices():
         scanner.stop()
 
 
-def check_updates():
+async def check_updates():
+    global addresses
     while True:
         current_dir = os.path.dirname(__file__)
         script_path = os.path.join(current_dir, 'update_and_train.sh')
-        result = subprocess.run(['bash', script_path], capture_output=True, text=True)
-        print(result.stdout)
-        if len(result.stdout) > 0:
+        before_pull = set(os.listdir(os.path.join(current_dir, "dataset")))
+        print("Files in dataset before pull:", before_pull)
+
+        # Create subprocess to run the bash script asynchronously.
+        process = await asyncio.create_subprocess_exec(
+            'bash', script_path,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+
+        # Wait for the process to complete and capture both stdout and stderr.
+        stdout, stderr = await process.communicate()
+
+        # Decode the outputs from bytes to strings.
+        stdout_decoded = stdout.decode().strip() if stdout else ""
+        stderr_decoded = stderr.decode().strip() if stderr else ""
+        
+        print("Return code:", process.returncode)
+        print("STDOUT:", stdout_decoded)
+        print("STDERR:", stderr_decoded)
+        
+        if process.returncode == 0:
+            after_pull = set(os.listdir(os.path.join(current_dir, "dataset")))
+            new_users = list(after_pull - before_pull)
+            model_training(new_users)
             reload_encoding()
-        print(result.stderr)
-        sleep(60)
+        addresses = set(get_all_mac_addresses())
+        sleep(5)
 
 @app.route('/api/devices', methods=['GET'])
 def get_devices():
