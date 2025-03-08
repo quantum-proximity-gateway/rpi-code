@@ -44,7 +44,7 @@ DISTANCE_LIMIT = 3
 
 devices = {}
 logged_in = None
-server_url = "https://f3a2-144-82-8-84.ngrok-free.app"
+server_url = "https://2d40-31-205-125-238.ngrok-free.app"
 
 encryption_client = EncryptionClient(server_url)
 
@@ -66,7 +66,7 @@ def get_credentials(mac_address: str, totp: int):
             totp: totp
         }
         encrypted_data: dict = encryption_client.encrypt_request(data)
-        response = requests.put(f"{server_url}/devices/credentials", data=encrypted_data)
+        response = requests.put(f"{server_url}/devices/credentials", json=encrypted_data)
         response.raise_for_status()
         data = encryption_client.decrypt_request(response.json())
 
@@ -154,13 +154,13 @@ class ScanDelegate(DefaultDelegate):
 def scan_devices():
     global addresses, logged_in
 
-    addresses = set(get_all_mac_addresses())
     try:
         while True:
+            addresses = set(get_all_mac_addresses()) # change to rescan when dataset retrained?
             scanner = Scanner().withDelegate(ScanDelegate())
             print('Scanning for devices...')
             scanner.start(passive=True)
-            scanner.process(timeout=1)
+            scanner.process(timeout=3)
 
             for device in devices:
                 if time.time() - devices[device]['last_seen'] > TIMEOUT_LIMIT: # Delete user if not seen in the last 60 seconds
