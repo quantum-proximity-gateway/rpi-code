@@ -131,11 +131,11 @@ class ScanDelegate(DefaultDelegate):
                     service = peripheral.getServiceByUUID(SERVICE_UUID)
                     characteristic = service.getCharacteristics(CHARACTERISTIC_UUID)[0]
 
-                    # Value is the OTP key {key: Key, mac_address: mac_address}
+                    # Value is the TOTP key
                     value = characteristic.read().decode("utf-8")
                     print(f"Value: {value}")
 
-                    devices[mac_address]['value'] = json.loads(value)
+                    devices[mac_address]['value'] = int(value)
                     peripheral.disconnect()
                     print("Disconnected.")
             except Exception as e:
@@ -187,9 +187,10 @@ def scan_devices():
             user_found = face_recognizer.main_loop(filtered_users)
 
             if user_found is not None:
+                mac_address = all_usernames[user_found]
+                totp = devices[mac_address]['value']
+                username, password = get_credentials(mac_address, totp)
                 print("Sending credentials")
-                
-                username, password = get_credentials(all_usernames[user_found])
                 uart_rpi5.write_to_pico(username, password)
 
                 print(f"devices before: {devices}")
