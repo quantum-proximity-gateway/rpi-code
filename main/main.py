@@ -59,9 +59,14 @@ def get_all_mac_addresses():
         print(f"Error occurred while fetching MAC addresses: {e}")
         return []
  
-def get_credentials(mac_address: str): #TODO: Change to be used only when key validated
+def get_credentials(mac_address: str, totp: int):
     try:
-        response = requests.get(f"{server_url}/devices/{mac_address}/credentials", params={'client_id': encryption_client.CLIENT_ID})
+        data = {
+            mac_address: mac_address,
+            totp: totp
+        }
+        encrypted_data: dict = encryption_client.encrypt_request(data)
+        response = requests.put(f"{server_url}/devices/credentials", data=encrypted_data)
         response.raise_for_status()
         data = encryption_client.decrypt_request(response.json())
 
