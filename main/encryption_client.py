@@ -16,7 +16,7 @@ class EncryptedResponse(BaseModel):
 class EncryptionClient():
     def __init__(self, SERVER_URL):
         self.CLIENT_ID = str(uuid.uuid4())
-        self.KEM_ALGORITHM = 'Kyber512'
+        self.KEM_ALGORITHM = 'ML-KEM-512'
         self.SERVER_URL = SERVER_URL  # Bug with urllib3, so using http instead of https
         self.shared_secret = self.generate_shared_secret()
 
@@ -49,7 +49,7 @@ class EncryptionClient():
         
         return shared_secret
 
-    def encrypt_request(self, plaintext: str) -> dict:
+    def encrypt_request(self, plaintext: dict) -> dict:
         plaintext_str = json.dumps(plaintext)
 
         nonce_b64, ciphertext_b64 = aesgcm_encrypt(plaintext_str, self.shared_secret)

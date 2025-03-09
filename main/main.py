@@ -44,7 +44,7 @@ DISTANCE_LIMIT = 3
 
 devices = {}
 logged_in = None
-server_url = "https://f3a2-144-82-8-84.ngrok-free.app"
+server_url = "https://2d40-31-205-125-238.ngrok-free.app"
 
 encryption_client = EncryptionClient(server_url)
 
@@ -59,9 +59,14 @@ def get_all_mac_addresses():
         print(f"Error occurred while fetching MAC addresses: {e}")
         return []
  
-def get_credentials(mac_address: str): #TODO: Change to be used only when key validated
+def get_credentials(mac_address: str, totp: int):
     try:
-        response = requests.get(f"{server_url}/devices/{mac_address}/credentials", params={'client_id': encryption_client.CLIENT_ID})
+        data = {
+            'mac_address': mac_address,
+            'totp': totp
+        }
+        encrypted_data: dict = encryption_client.encrypt_request(data)
+        response = requests.put(f"{server_url}/devices/credentials", json=encrypted_data)
         response.raise_for_status()
         data = encryption_client.decrypt_request(response.json())
 
@@ -126,11 +131,11 @@ class ScanDelegate(DefaultDelegate):
                     service = peripheral.getServiceByUUID(SERVICE_UUID)
                     characteristic = service.getCharacteristics(CHARACTERISTIC_UUID)[0]
 
-                    # Value is the OTP key {key: Key, mac_address: mac_address}
+                    # Value is the TOTP key
                     value = characteristic.read().decode("utf-8")
                     print(f"Value: {value}")
 
-                    devices[mac_address]['value'] = json.loads(value)
+                    devices[mac_address]['value'] = int(value)
                     peripheral.disconnect()
                     print("Disconnected.")
             except Exception as e:
@@ -149,13 +154,13 @@ class ScanDelegate(DefaultDelegate):
 def scan_devices():
     global addresses, logged_in
 
-    addresses = set(get_all_mac_addresses())
     try:
         while True:
+            addresses = set(get_all_mac_addresses()) # change to rescan when dataset retrained?
             scanner = Scanner().withDelegate(ScanDelegate())
             print('Scanning for devices...')
             scanner.start(passive=True)
-            scanner.process(timeout=1)
+            scanner.process(timeout=3)
 
             for device in devices:
                 if time.time() - devices[device]['last_seen'] > TIMEOUT_LIMIT: # Delete user if not seen in the last 60 seconds
@@ -182,9 +187,10 @@ def scan_devices():
             user_found = face_recognizer.main_loop(filtered_users)
 
             if user_found is not None:
+                mac_address = all_usernames[user_found]
+                totp = devices[mac_address]['value']
+                username, password = get_credentials(mac_address, totp)
                 print("Sending credentials")
-                
-                username, password = get_credentials(all_usernames[user_found])
                 uart_rpi5.write_to_pico(username, password)
 
                 print(f"devices before: {devices}")
