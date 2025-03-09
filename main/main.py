@@ -62,8 +62,8 @@ def get_all_mac_addresses():
 def get_credentials(mac_address: str, totp: int):
     try:
         data = {
-            mac_address: mac_address,
-            totp: totp
+            'mac_address': mac_address,
+            'totp': totp
         }
         encrypted_data: dict = encryption_client.encrypt_request(data)
         response = requests.put(f"{server_url}/devices/credentials", json=encrypted_data)
