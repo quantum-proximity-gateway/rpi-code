@@ -4,19 +4,17 @@ from threading import Thread
 from flask import Flask, jsonify
 from flask_cors import CORS
 import time
-import subprocess
-import json
 import requests
-import os
 import uart_rpi5
 from recognise import FaceRecognizer
 from pydantic import BaseModel
 from encryption_client import EncryptionClient
-
+import logging
 app = Flask(__name__)
 CORS(app)
 
-
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 # Specific model needed by front-end
 class User(BaseModel):
     name: str
@@ -190,7 +188,11 @@ def scan_devices():
                 if 'value' not in devices[mac_address]:
                     continue
                 totp = devices[mac_address]['value']
-                username, password = get_credentials(mac_address, totp)
+                try:
+                    username, password = get_credentials(mac_address, totp)
+                except:
+                    print("TOTP didn't match")
+                    continue
                 print("Sending credentials")
                 uart_rpi5.write_to_pico(username, password)
 
@@ -208,10 +210,8 @@ def scan_devices():
 
 @app.route('/api/devices', methods=['GET'])
 def get_devices():
-    print(devices)
     users = []
     for device in devices:
-        print(f"device: {device}")
         users.append({"name": devices[device]['name'], "distance":devices[device]['distance'],"loggedIn": devices[device]['loggedIn'] })
     validated_users = [User(**user).dict() for user in users]
     return jsonify(validated_users)
