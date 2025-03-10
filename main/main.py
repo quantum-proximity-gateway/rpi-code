@@ -215,7 +215,6 @@ def get_devices():
     return jsonify(validated_users)
 
 if __name__ == '__main__':
-    reload_encoding()
     scan_thread = Thread(target=scan_devices)
     scan_thread.start()
     app.run(host='0.0.0.0', port=5000)
