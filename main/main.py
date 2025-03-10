@@ -187,6 +187,8 @@ def scan_devices():
 
             if user_found is not None:
                 mac_address = all_usernames[user_found]
+                if 'value' not in devices[mac_address]:
+                    continue
                 totp = devices[mac_address]['value']
                 username, password = get_credentials(mac_address, totp)
                 print("Sending credentials")
