@@ -11,10 +11,7 @@ import os
 import uart_rpi5
 from recognise import FaceRecognizer
 from pydantic import BaseModel
-import pickle
 from encryption_client import EncryptionClient
-
-data = None
 
 app = Flask(__name__)
 CORS(app)
@@ -36,17 +33,16 @@ DISTANCE_LIMIT = 3
 
 devices = {}
 logged_in = None
-server_url = "https://2d40-31-205-125-238.ngrok-free.app"
+server_url = "https://3ef1-31-205-125-238.ngrok-free.app"
 
 encryption_client = EncryptionClient(server_url)
 
 def reload_encoding():
-    global data
     response = requests.get(f"{server_url}/encodings", params={'client_id': encryption_client.CLIENT_ID})
     response.raise_for_status()
     response_json = response.json()
     data = encryption_client.decrypt_request(response_json)
-    print("New data", data)
+    return data
 
 def get_all_mac_addresses():
     try:
@@ -157,7 +153,7 @@ def scan_devices():
     try:
         while True:
             addresses = set(get_all_mac_addresses()) # change to rescan when dataset retrained?
-            reload_encoding()
+            data = reload_encoding()
             scanner = Scanner().withDelegate(ScanDelegate())
             print('Scanning for devices...')
             scanner.start(passive=True)
@@ -184,7 +180,8 @@ def scan_devices():
                     filtered_users.append(username)
 
             # send list of usernames to facial recog script
-            print("Before rec", data)
+            if data == {}:
+                continue
             face_recognizer = FaceRecognizer(data)
             user_found = face_recognizer.main_loop(filtered_users)
 
@@ -222,5 +219,3 @@ if __name__ == '__main__':
     scan_thread = Thread(target=scan_devices)
     scan_thread.start()
     app.run(host='0.0.0.0', port=5000)
-
-# https://prod.liveshare.vsengsaas.visualstudio.com/join?F90D5A054A593F9B4EFFAF49EF458BF4ABA4
