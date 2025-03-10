@@ -184,7 +184,7 @@ def scan_devices():
                     filtered_users.append(username)
 
             # send list of usernames to facial recog script
-            print(data)
+            print("Before rec", data)
             face_recognizer = FaceRecognizer(data)
             user_found = face_recognizer.main_loop(filtered_users)
 
