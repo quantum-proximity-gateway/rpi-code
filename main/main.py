@@ -11,18 +11,7 @@ import os
 import uart_rpi5
 from recognise import FaceRecognizer
 from pydantic import BaseModel
-import pickle
 from encryption_client import EncryptionClient
-
-data = None
-
-def reload_encoding():
-    global data
-    # Load pre-trained face encodings
-    print("[INFO] loading encodings...")
-    print(os.listdir())
-    with open("encodings.pickle", "rb") as f:
-        data = pickle.loads(f.read())
 
 app = Flask(__name__)
 CORS(app)
@@ -44,9 +33,16 @@ DISTANCE_LIMIT = 3
 
 devices = {}
 logged_in = None
-server_url = "https://2d40-31-205-125-238.ngrok-free.app"
+server_url = "https://3ef1-31-205-125-238.ngrok-free.app"
 
 encryption_client = EncryptionClient(server_url)
+
+def reload_encoding():
+    response = requests.get(f"{server_url}/encodings", params={'client_id': encryption_client.CLIENT_ID})
+    response.raise_for_status()
+    response_json = response.json()
+    data = encryption_client.decrypt_request(response_json)
+    return data
 
 def get_all_mac_addresses():
     try:
@@ -157,6 +153,7 @@ def scan_devices():
     try:
         while True:
             addresses = set(get_all_mac_addresses()) # change to rescan when dataset retrained?
+            data = reload_encoding()
             scanner = Scanner().withDelegate(ScanDelegate())
             print('Scanning for devices...')
             scanner.start(passive=True)
@@ -183,6 +180,8 @@ def scan_devices():
                     filtered_users.append(username)
 
             # send list of usernames to facial recog script
+            if data == {}:
+                continue
             face_recognizer = FaceRecognizer(data)
             user_found = face_recognizer.main_loop(filtered_users)
 
@@ -205,18 +204,6 @@ def scan_devices():
     except KeyboardInterrupt:
         scanner.stop()
 
-
-def check_updates():
-    while True:
-        current_dir = os.path.dirname(__file__)
-        script_path = os.path.join(current_dir, 'update_and_train.sh')
-        result = subprocess.run(['bash', script_path], capture_output=True, text=True)
-        print(result.stdout)
-        if len(result.stdout) > 0:
-            reload_encoding()
-        print(result.stderr)
-        sleep(60)
-
 @app.route('/api/devices', methods=['GET'])
 def get_devices():
     print(devices)
@@ -228,11 +215,6 @@ def get_devices():
     return jsonify(validated_users)
 
 if __name__ == '__main__':
-    reload_encoding()
     scan_thread = Thread(target=scan_devices)
     scan_thread.start()
-    bash_thread = Thread(target=check_updates)
-    bash_thread.start()
     app.run(host='0.0.0.0', port=5000)
-
-# https://prod.liveshare.vsengsaas.visualstudio.com/join?F90D5A054A593F9B4EFFAF49EF458BF4ABA4
