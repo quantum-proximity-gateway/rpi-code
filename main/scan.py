@@ -12,6 +12,8 @@ CHARACTERISTIC_UUID = "a3445e11-5bff-4d2a-a3b1-b127f9567bb6"
 
 TIMEOUT_LIMIT = 60
 DISTANCE_LIMIT = 3
+STRIKE_LIMIT = 5
+
 server_url = "https://3ef1-31-205-125-238.ngrok-free.app"
 encryption_client = EncryptionClient(server_url)
 
@@ -86,10 +88,17 @@ class ScanDelegate(DefaultDelegate):
             logging.info(f"{dev.addr} is {distance}m away.")
             mac_address = dev.addr
             if mac_address not in devices:
-                devices[mac_address] = {'loggedIn': False, 'name': None}
+                devices[mac_address] = {'loggedIn': False, 'name': None, 'strikes': 0}
             devices[mac_address]['last_seen'] = time.time()
+            
             if devices[mac_address]['loggedIn'] and distance > DISTANCE_LIMIT:
-                devices[mac_address]['loggedIn'] = False
+                if devices[mac_address]['strikes'] < STRIKE_LIMIT:
+                    devices[mac_address]['strikes'] += 1
+                else:
+                    devices[mac_address]['loggedIn'] = False
+            elif devices[mac_address]['loggedIn'] and distance < DISTANCE_LIMIT:
+                devices[mac_address]['strikes'] = 0
+
             devices[mac_address]['distance'] = distance
             try:
                 with Peripheral(mac_address) as peripheral:
