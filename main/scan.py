@@ -90,7 +90,7 @@ class ScanDelegate(DefaultDelegate):
             if mac_address not in devices:
                 devices[mac_address] = {'loggedIn': False, 'name': None, 'strikes': 0}
             devices[mac_address]['last_seen'] = time.time()
-            
+
             if devices[mac_address]['loggedIn'] and distance > DISTANCE_LIMIT:
                 if devices[mac_address]['strikes'] < STRIKE_LIMIT:
                     devices[mac_address]['strikes'] += 1
@@ -115,6 +115,11 @@ class ScanDelegate(DefaultDelegate):
                 sleep(1)
         
     def calculateDistance(self, rssi):
+        '''
+            Distance = 10 ^ ((Measured Power -RSSI)/(10 * N))
+            Measured Power = RSSI at 1m
+            N = Constant from 2-4 depending on Signal Strength
+        '''
         return 10 ** ((-40 - int(rssi)) / (10 * 4))
 
 def scan_devices():
