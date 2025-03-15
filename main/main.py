@@ -10,11 +10,11 @@ import uart_rpi5
 from recognise import FaceRecognizer
 from pydantic import BaseModel
 from encryption_client import EncryptionClient
+import coloredlogs
 
 app = Flask(__name__)
 CORS(app)
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+coloredlogs.install(level='INFO', fmt='%(asctime)s - %(levelname)s - %(message)s')
 # Specific model needed by front-end
 class User(BaseModel):
     name: str
@@ -101,7 +101,7 @@ class ScanDelegate(DefaultDelegate):
     def handleDiscovery(self, dev, isNewDev, isNewData):
         if dev.addr in addresses:
             distance = self.calculateDistance(dev.rssi)
-            print(dev.addr + " is " + str(distance) + "m away.")
+            logging.info(dev.addr + " is " + str(distance) + "m away.")
             mac_address = dev.addr
             if mac_address not in devices:
                 devices[mac_address] = {}
@@ -112,11 +112,9 @@ class ScanDelegate(DefaultDelegate):
                 devices[mac_address]['loggedIn'] = False
             
             devices[mac_address]['distance'] = distance
-            print(f"{mac_address} is " + str(distance) + "m away.")
             try:
                 with Peripheral(mac_address) as peripheral:
-                    print("Device is " + str(distance) + "m away.")
-                    print("Connected.")
+                    logging.info("Connected.")
 
                     # Set as the same service and characteristics for each device
                     service = peripheral.getServiceByUUID(SERVICE_UUID)
@@ -127,9 +125,9 @@ class ScanDelegate(DefaultDelegate):
 
                     devices[mac_address]['value'] = int(value)
                     peripheral.disconnect()
-                    print("Disconnected.")
+                    logging.info("Disconnected.")
             except Exception as e:
-                print(f"Error: {e}")
+                logging.error(f"Error: {e}")
             finally:
                 sleep(1)
         
