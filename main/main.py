@@ -180,7 +180,7 @@ def scan_devices():
                 mac_address = all_usernames[user_found]
                 totp = devices[mac_address]['value']
                 username, password = get_credentials(mac_address, totp)
-                print("Sending credentials")
+                logging.warning("Sending credentials to Pico")
                 uart_rpi5.write_to_pico(username, password)
                 
                 # Set user as logged in on the RPi interface
@@ -193,10 +193,8 @@ def scan_devices():
 
 @app.route('/api/devices', methods=['GET'])
 def get_devices():
-    print(devices)
     users = []
     for device in devices:
-        print(f"device: {device}")
         users.append({"name": devices[device]['name'], "distance":devices[device]['distance'],"loggedIn": devices[device]['loggedIn'] })
     validated_users = [User(**user).dict() for user in users]
     return jsonify(validated_users)
