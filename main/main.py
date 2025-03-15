@@ -50,7 +50,7 @@ def get_all_mac_addresses():
         data = encryption_client.decrypt_request(response_json)
         return [mac.strip() for mac in data['mac_addresses']]
     except requests.exceptions.RequestException as e:
-        print(f"Error occurred while fetching MAC addresses: {e}")
+        logging.error(f"Error occurred while fetching MAC addresses: {e}")
         return []
  
 def get_credentials(mac_address: str, totp: int):
@@ -67,7 +67,7 @@ def get_credentials(mac_address: str, totp: int):
         return data.get("username", "invalid"), data.get("password", "invalid")
 
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching username for MAC address {mac_address}: {e}")
+        logging.error(f"Error fetching username for MAC address {mac_address}: {e}")
         return "error"
 
 
@@ -80,7 +80,7 @@ def get_username_for_mac_address(mac_address: str):
         return data.get("username", "invalid")
 
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching username for MAC address {mac_address}: {e}")
+        logging.error(f"Error fetching username for MAC address {mac_address}: {e}")
         return "error"
 
 def get_all_usernames(list_mac_addresses: list):
@@ -101,8 +101,7 @@ class ScanDelegate(DefaultDelegate):
     def handleDiscovery(self, dev, isNewDev, isNewData):
         if dev.addr in addresses:
             distance = self.calculateDistance(dev.rssi)
-            print("Device is " + str(distance) + "m away.")
-            print("Device found:", dev.addr, "RSSI:", dev.rssi)
+            print(dev.addr + " is " + str(distance) + "m away.")
             mac_address = dev.addr
             if mac_address not in devices:
                 devices[mac_address] = {}
@@ -112,8 +111,6 @@ class ScanDelegate(DefaultDelegate):
             if devices[mac_address]['loggedIn'] and distance > DISTANCE_LIMIT: # Log out user when gone (distance 3m>)
                 devices[mac_address]['loggedIn'] = False
             
-            
-            distance = self.calculateDistance(dev.rssi)
             devices[mac_address]['distance'] = distance
             print(f"{mac_address} is " + str(distance) + "m away.")
             try:
