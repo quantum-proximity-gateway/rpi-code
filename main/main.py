@@ -4,10 +4,7 @@ from threading import Thread
 from flask import Flask, jsonify
 from flask_cors import CORS
 import time
-import subprocess
-import json
 import requests
-import os
 import uart_rpi5
 from recognise import FaceRecognizer
 from pydantic import BaseModel
