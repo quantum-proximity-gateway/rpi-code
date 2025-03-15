@@ -147,7 +147,7 @@ def scan_devices():
             addresses = set(get_all_mac_addresses()) # change to rescan when dataset retrained?
             data = reload_encoding()
             scanner = Scanner().withDelegate(ScanDelegate())
-            print('Scanning for devices...')
+            logging.info('Scanning for devices...')
             scanner.start(passive=True)
             scanner.process(timeout=3)
 
@@ -158,7 +158,6 @@ def scan_devices():
 
             # filter devices by 3m or less
             within_range_mac_addresses = [mac for mac in devices if devices[mac]['distance'] <= 3]
-            print(f"within_range_mac_addresses: {within_range_mac_addresses}")
 
             # get all usernames for each device via mac address from server {username: mac_address}
             all_usernames = get_all_usernames(within_range_mac_addresses)
@@ -183,15 +182,11 @@ def scan_devices():
                 username, password = get_credentials(mac_address, totp)
                 print("Sending credentials")
                 uart_rpi5.write_to_pico(username, password)
-
-                print(f"devices before: {devices}")
                 
                 # Set user as logged in on the RPi interface
                 devices[all_usernames[user_found]]['loggedIn'] = True
                 logged_in = all_usernames[user_found]
                 devices[all_usernames[user_found]]['name'] = user_found
-
-                print(f"devices after: {devices}")
 
     except KeyboardInterrupt:
         scanner.stop()
