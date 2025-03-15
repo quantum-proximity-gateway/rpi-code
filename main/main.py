@@ -105,9 +105,10 @@ class ScanDelegate(DefaultDelegate):
             mac_address = dev.addr
             if mac_address not in devices:
                 devices[mac_address] = {}
-            devices[mac_address]['last_seen'] = time.time() # Timestamp for all devices
-            if 'loggedIn' not in devices[mac_address]:
                 devices[mac_address]['loggedIn'] = False
+
+            devices[mac_address]['last_seen'] = time.time() # Timestamp for all devices
+
             if devices[mac_address]['loggedIn'] and distance > DISTANCE_LIMIT: # Log out user when gone (distance 3m>)
                 devices[mac_address]['loggedIn'] = False
             
