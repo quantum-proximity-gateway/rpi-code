@@ -18,25 +18,25 @@ export default function Home() {
   }
 
   const [users, setUsers] = useState<User[]>([]);
+  const [online, setOnline] = useState<boolean>(true);
 
   async function getUserData(): Promise<User[]> {
-    const response = await fetch("http://localhost:5000/api/devices");
-    const data = await response.json();
-    return data;
-
-    // Placeholder data
-    // const data: User[] = [
-    //   { name: "Alice", distance: 0, loggedIn: false },
-    //   { name: "Bob", distance: Math.random()*10, loggedIn: true },
-    //   { name: "Charlie", distance: Math.random()*10, loggedIn: false },
-    //   { name: "Dale", distance: Math.random()*10, loggedIn: false },
-    // ];
-    // Simulate API response delay
-    return new Promise(resolve => setTimeout(() => resolve(data), 1000)); // 1 second to match scanning timeout
+    try {
+      const response = await fetch("http://localhost:5000/api/devices");
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      setOnline(true);
+      return data;
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+      setOnline(false);
+      return [];
+    }
   }
 
   useEffect(() => {
-    // Call API every half second to update the user data
     const interval = setInterval(() => {
       getUserData().then(data => setUsers(data));
     }, 500);
@@ -53,6 +53,7 @@ export default function Home() {
   }
 
   return (
+    online ? (
     <div style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", flexWrap: "wrap", height: "100vh", gap: "50px", padding: "50px"}}>
       {users.map(user => {
         const circleSize = calculateCircleSize(user.distance);
@@ -68,5 +69,10 @@ export default function Home() {
         );
       })}
     </div>
+    ): (
+      <div style={{display: "flex", justifyContent: "center", alignItems: "center", height: "100vh"}}>
+        <p>Offline: Unable to fetch user data</p>
+      </div>
+    )
   );
 }
