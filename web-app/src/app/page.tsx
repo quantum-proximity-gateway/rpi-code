@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 /*
   Website to showcase distances to each user, continuously need to call the API to get the latest data.
@@ -20,7 +20,7 @@ export default function Home() {
   const [users, setUsers] = useState<User[]>([]);
   const [online, setOnline] = useState<boolean>(true);
 
-  async function getUserData(): Promise<User[]> {
+  const getUserData = useCallback(async (): Promise<User[]> => {
     try {
       const response = await fetch("http://localhost:5000/api/devices");
       if (!response.ok) {
@@ -34,15 +34,15 @@ export default function Home() {
       setOnline(false);
       return [];
     }
-  }
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      getUserData().then(data => setUsers(data));
+      getUserData().then((data: User[]) => setUsers(data));
     }, 500);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [getUserData]);
 
   const calculateCircleSize = (distance: number) => {
     const minSize = 50;
@@ -59,7 +59,7 @@ export default function Home() {
         const circleSize = calculateCircleSize(user.distance);
 
         return (
-          <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: "5px"}}>
+          <div key={user.name} style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: "5px"}}>
             <p>{user.name}</p>
             <div key={user.name} style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", width: `${circleSize}px`, height: `${circleSize}px`, border:`3px solid ${user.loggedIn ? "blue" : user.distance < 3 ? "green" : "red"}`, borderRadius: "50%", overflow: "hidden", whiteSpace: "nowrap" ,transition: "width 0.5s, height 0.5s, border-color 0.5s"}}>
               <p>{user.distance.toFixed(2)}m</p>
