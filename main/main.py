@@ -5,6 +5,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 import time
 import requests
+import logging
 import uart_rpi5
 from recognise import FaceRecognizer
 from pydantic import BaseModel
@@ -13,7 +14,7 @@ from encryption_client import EncryptionClient
 app = Flask(__name__)
 CORS(app)
 
-
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 # Specific model needed by front-end
 class User(BaseModel):
     name: str
@@ -126,7 +127,6 @@ class ScanDelegate(DefaultDelegate):
 
                     # Value is the TOTP key
                     value = characteristic.read().decode("utf-8")
-                    print(f"Value: {value}")
 
                     devices[mac_address]['value'] = int(value)
                     peripheral.disconnect()
