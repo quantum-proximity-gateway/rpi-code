@@ -3,8 +3,7 @@ import cv2
 import numpy as np
 from picamera2 import Picamera2
 import time
-import sys
-import os
+import logging
 
 picam2 = Picamera2()
 picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (1280, 720)}))
@@ -74,12 +73,12 @@ class FaceRecognizer:
         return self.fps
 
     def main_loop(self, list_of_names):
-        print('Facial recognition stage')
+        logging.info("Facial Recognition Started")
         if not list_of_names:
             return None
         
         start_time_loop = time.time()
-        while time.time() - start_time_loop < 2:
+        while time.time() - start_time_loop < 2: # Check for 2 seconds only
             frame = picam2.capture_array()
             person_found = False
             processed_frame = None
@@ -88,7 +87,7 @@ class FaceRecognizer:
                 processed_frame, person_checking_found = self.process_frame(frame, name)
                 if person_checking_found:
                     person_found = True
-                    print(name, "was found.")
+                    logging.info(name, "was found.")
                     return name
 
             if person_found:
