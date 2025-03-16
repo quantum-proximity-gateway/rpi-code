@@ -5,7 +5,13 @@ import time
 def write_to_pico(username, password):
     ser = serial.Serial('/dev/ttyAMA0', baudrate=9600, timeout=1) # Specify baud rate and timeout
     try:
+        start_time = time.time()
         while True:
+            # Check if 10 seconds have elapsed
+            if time.time() - start_time > 10:
+                print("Communication timeout after 10 seconds")
+                return
+                
             json_data = f'{{"username": "{username}", "password": "{password}"}}\n'
             ser.write(json_data.encode())
             response = ser.readline() 
