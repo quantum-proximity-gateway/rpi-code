@@ -2,10 +2,18 @@ import serial
 import time
 
 
+class CommunicationTimeoutException(Exception):
+    pass
+
+
 def write_to_pico(username, password):
     ser = serial.Serial('/dev/ttyAMA0', baudrate=9600, timeout=1) # Specify baud rate and timeout
     try:
+        start_time = time.time()
         while True:
+            if time.time() - start_time > 10:
+                raise CommunicationTimeoutException("Communication timeout after 10 seconds")
+                
             json_data = f'{{"username": "{username}", "password": "{password}"}}\n'
             ser.write(json_data.encode())
             response = ser.readline() 
@@ -23,6 +31,10 @@ def write_to_pico(username, password):
             time.sleep(1)  # Wait for a second before repeating
     except serial.SerialException as e:
         print(f"Error: {e}")
+        raise
+    except CommunicationTimeoutException as e:
+        print(f"Error: {e}")
+        raise
     finally:
         if ser.is_open:
             ser.close()
