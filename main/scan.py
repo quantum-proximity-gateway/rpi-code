@@ -189,7 +189,10 @@ def scan_devices():
                 logging.warning("Sending credentials to Pico")
                 uart_rpi5.write_to_pico(username, password)
                 
+                # Only set loggedIn and name if write_to_pico succeeds
                 devices[mac_address]['loggedIn'] = True
                 devices[mac_address]['name'] = user_found
-            except:
-                logging.error(f"Error communicating with Pico")
+            except uart_rpi5.CommunicationTimeoutException as e:
+                logging.error(f"Communication timeout: {e}")
+            except Exception as e:
+                logging.error(f"Error communicating with Pico: {e}")
