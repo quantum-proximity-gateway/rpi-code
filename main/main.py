@@ -1,7 +1,6 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 from threading import Thread
-import logging
 import coloredlogs
 from pydantic import BaseModel
 
