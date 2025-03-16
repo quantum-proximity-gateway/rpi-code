@@ -31,7 +31,7 @@ def reload_encoding():
         return data
     except requests.exceptions.RequestException as e:
         logging.error(f"Error occurred while fetching encodings: {e}")
-        return {}  # Return empty dict to allow loop to continue
+        return {}
 
 def get_all_mac_addresses():
     try:
@@ -176,18 +176,15 @@ def scan_devices():
         if user_found is not None:
             mac_address = all_usernames[user_found]
             totp = devices[mac_address]['value']
-            try:
-                credentials = get_credentials(mac_address, totp)
-                if credentials is None:
-                    logging.error("Failed to get credentials.")
-                    continue
-                username, password = credentials
-            except Exception as e:
-                logging.error(f"Exception occurred: {e}")
+            username, password = get_credentials(mac_address, totp)
+            if username == "invalid" or password == "invalid":
+                logging.error("Failed to get valid credentials.")
                 continue
-
-            logging.warning("Sending credentials to Pico")
-            uart_rpi5.write_to_pico(username, password)
             
-            devices[mac_address]['loggedIn'] = True
-            devices[mac_address]['name'] = user_found
+            try:
+                logging.warning("Sending credentials to Pico")
+                uart_rpi5.write_to_pico(username, password)
+                devices[mac_address]['loggedIn'] = True
+                devices[mac_address]['name'] = user_found
+            except Exception as e:
+                logging.error(f"Error sending credentials to Pico: {e}")
