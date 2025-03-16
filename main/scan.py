@@ -75,7 +75,7 @@ def get_credentials(mac_address: str, totp: int):
         return data.get("username", "invalid"), data.get("password", "invalid")
     except requests.exceptions.RequestException as e:
         logging.error(f"Error fetching credentials for MAC address {mac_address}: {e}")
-        return "error", "error"
+        
 
 class ScanDelegate(DefaultDelegate):
     def __init__(self):
@@ -158,7 +158,16 @@ def scan_devices():
         if user_found is not None:
             mac_address = all_usernames[user_found]
             totp = devices[mac_address]['value']
-            username, password = get_credentials(mac_address, totp)
+            try:
+                credentials = get_credentials(mac_address, totp)
+                if credentials is None:
+                    logging.error("Failed to get credentials.")
+                    continue
+                username, password = credentials
+            except Exception as e:
+                logging.error(f"Exception occurred: {e}")
+                continue
+
             logging.warning("Sending credentials to Pico")
             uart_rpi5.write_to_pico(username, password)
             
