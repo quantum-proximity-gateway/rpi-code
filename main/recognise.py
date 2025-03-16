@@ -87,7 +87,7 @@ class FaceRecognizer:
                 processed_frame, person_checking_found = self.process_frame(frame, name)
                 if person_checking_found:
                     person_found = True
-                    logging.info(name, "was found.")
+                    logging.info(f'{name} was found')
                     return name
 
             if person_found:
