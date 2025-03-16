@@ -31,8 +31,10 @@ def write_to_pico(username, password):
             time.sleep(1)  # Wait for a second before repeating
     except serial.SerialException as e:
         print(f"Error: {e}")
+        raise
     except CommunicationTimeoutException as e:
         print(f"Error: {e}")
+        raise
     finally:
         if ser.is_open:
             ser.close()
