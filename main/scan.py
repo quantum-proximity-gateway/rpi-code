@@ -20,14 +20,18 @@ encryption_client = EncryptionClient(server_url)
 devices = {}
 
 def reload_encoding():
-    response = requests.get(
-        f"{server_url}/encodings", 
-        params={'client_id': encryption_client.CLIENT_ID}
-    )
-    response.raise_for_status()
-    response_json = response.json()
-    data = encryption_client.decrypt_request(response_json)
-    return data
+    try:
+        response = requests.get(
+            f"{server_url}/encodings", 
+            params={'client_id': encryption_client.CLIENT_ID}
+        )
+        response.raise_for_status()
+        response_json = response.json()
+        data = encryption_client.decrypt_request(response_json)
+        return data
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Error occurred while fetching encodings: {e}")
+        return {}  # Return empty dict to allow loop to continue
 
 def get_all_mac_addresses():
     try:
@@ -127,10 +131,18 @@ def scan_devices():
     while True:
         addresses = set(get_all_mac_addresses())
         data = reload_encoding()
+        
         scanner = Scanner().withDelegate(ScanDelegate())
         logging.info("Scanning for devices...")
-        scanner.start(passive=True)
-        scanner.process(timeout=3)
+        
+        try:
+            scanner.start(passive=True)
+            scanner.process(timeout=3)
+        except Exception as e:
+            logging.error(f"Error during device scanning: {e}")
+            # Continue with the next iteration if scanning fails
+            sleep(1)
+            continue
         
         for dev in list(devices):
             if time.time() - devices[dev]['last_seen'] > TIMEOUT_LIMIT:
@@ -138,7 +150,7 @@ def scan_devices():
                 del devices[dev]
         
         within_range_mac_addresses = [
-            mac for mac in devices if devices[mac]['distance'] <= DISTANCE_LIMIT
+            mac for mac in devices if devices[mac].get('distance', float('inf')) <= DISTANCE_LIMIT
         ]
         all_usernames = get_all_usernames(within_range_mac_addresses)
         
@@ -149,11 +161,17 @@ def scan_devices():
             if not devices[mac_add]['loggedIn']:
                 filtered_users.append(username)
         
-        if data == {}:
+        if not data:
+            logging.warning("No facial encoding data available, skipping face recognition")
+            sleep(1)
             continue
         
-        face_recognizer = FaceRecognizer(data)
-        user_found = face_recognizer.main_loop(filtered_users)
+        try:
+            face_recognizer = FaceRecognizer(data)
+            user_found = face_recognizer.main_loop(filtered_users)
+        except Exception as e:
+            logging.error(f"Error during face recognition: {e}")
+            user_found = None
         
         if user_found is not None:
             mac_address = all_usernames[user_found]
