@@ -92,7 +92,6 @@ Refer to the [open quantum safe liboqs get started page](https://openquantumsafe
 
 TODO
 
-
 ## License
 
 This project is licensed under the terms of the MIT license. Refer to [LICENSE](LICENSE) for more information.
