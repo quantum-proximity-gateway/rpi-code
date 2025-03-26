@@ -6,12 +6,15 @@
 - [Raspberry Pi 5](#raspberry-pi-5)
   - [Requirements](#requirements)
   - [Installation](#installation)
+  - [Usage](#usage)
 - [Raspberry Pi Pico](#raspberry-pi-pico)
   - [Requirements](#requirements-1)
   - [Installation](#installation-1)
+  - [Usage](#usage-1)
 - [Web App](#web-app)
   - [Requirements](#requirements-2)
   - [Installation](#installation-2)
+  - [Usage](#usage-2)
 - [Troubleshooting](#troubleshooting)
   - [Liboqs](#liboqs)
 - [Misc.](#misc)
@@ -39,6 +42,10 @@ TODO
 
 TODO
 
+### Usage
+
+TODO
+
 ## Raspberry Pi Pico
 
 ### Requirements
@@ -49,15 +56,31 @@ TODO
 
 TODO
 
+### Usage
+
+TODO
+
 ## Web App
 
 ### Requirements
 
-TODO
+- NodeJS
 
 ### Installation
 
-TODO
+First, navigate to the `web-app/` directory. Then, run the following command to install the necessary packages:
+
+```bash
+npm install
+```
+
+### Usage
+
+From the same directory as [Installation](#installation-2), run the following command to run the website:
+
+```bash
+npm run dev
+```
 
 ## Troubleshooting
 
