@@ -3,8 +3,15 @@
 <details>
   <summary><strong>Table of Contents</strong></summary>
 
-- [Requirements](#requirements)
-- [Installation](#installation)
+- [Raspberry Pi 5](#raspberry-pi-5)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+- [Raspberry Pi Pico](#raspberry-pi-pico)
+  - [Requirements](#requirements-1)
+  - [Installation](#installation-1)
+- [Web App](#web-app)
+  - [Requirements](#requirements-2)
+  - [Installation](#installation-2)
 - [Troubleshooting](#troubleshooting)
   - [Liboqs](#liboqs)
 - [Misc.](#misc)
@@ -12,13 +19,43 @@
 
 </details>
 
-This code is already setup on the Raspberry Pi 5s, so only the [Usage](#usage) section needs to be looked at. However, we have also included additional instructions below just in case you want to change the code yourself and test things out.
+This code is already setup on the Raspberry Pi 5s and Raspberry Pi Picos, so only the [Usage](#usage) section needs to be looked at. However, we have also included additional instructions below just in case you want to change the code yourself and test things out.
 
-## Requirements
+The code is split into 3 main parts:
+
+1) `main/` - this includes all the code used on the Raspberry Pi 5s.
+
+2) `pico/` - this includes all the code used on the Raspberry Pi Picos.
+
+3) `web-app/` - this includes the code for the simple web application which displays the current active users (ESP32s) the Raspberry Pi 5 is searching for, and their distance to the Raspberry Pi 5.
+
+## Raspberry Pi 5
+
+### Requirements
 
 TODO
 
-## Installation
+### Installation
+
+TODO
+
+## Raspberry Pi Pico
+
+### Requirements
+
+TODO
+
+### Installation
+
+TODO
+
+## Web App
+
+### Requirements
+
+TODO
+
+### Installation
 
 TODO
 
