@@ -14,7 +14,7 @@ TIMEOUT_LIMIT = 60
 DISTANCE_LIMIT = 3
 STRIKE_LIMIT = 5
 
-server_url = "https://3a44-31-205-125-238.ngrok-free.app"
+server_url = "https://litestar-server.1t65wn3ankpt.eu-gb.codeengine.appdomain.cloud"
 encryption_client = EncryptionClient(server_url)
 
 devices = {}
