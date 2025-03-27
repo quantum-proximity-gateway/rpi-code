@@ -1,12 +1,22 @@
 # -*- mode: python ; coding: utf-8 -*-
+import os
+import bluepy
+import sys
 
 block_cipher = None
+
+# Find the bluepy path
+bluepy_path = os.path.dirname(bluepy.__file__)
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[
+        # Include bluepy data files
+        (os.path.join(bluepy_path, 'bluepy-helper'), 'bluepy'),
+        (os.path.join(bluepy_path, '*.json'), 'bluepy'),
+    ],
     hiddenimports=[
         # Flask related
         'flask',
@@ -62,11 +72,20 @@ a = Analysis(
     noarchive=False,
 )
 
-# Include any data files like cascades for CV
-a.datas += [
-    # If you have any data files to include, add them here
-    # ('path/to/included/file', '/abs/path/to/your/file', 'DATA'),
-]
+# Include bluepy data files more explicitly
+for root, dirs, files in os.walk(bluepy_path):
+    for file in files:
+        if file.endswith('.json'):
+            source = os.path.join(root, file)
+            dest = os.path.join('bluepy', os.path.relpath(source, bluepy_path))
+            a.datas.append((dest, source, 'DATA'))
+
+# Include the bluepy-helper binary
+helper_path = os.path.join(bluepy_path, 'bluepy-helper')
+if os.path.exists(helper_path):
+    a.datas.append(('bluepy/bluepy-helper', helper_path, 'DATA'))
+else:
+    print("WARNING: bluepy-helper not found at", helper_path)
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
