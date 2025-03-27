@@ -2,11 +2,15 @@
 import os
 import bluepy
 import sys
+import face_recognition_models
 
 block_cipher = None
 
 # Find the bluepy path
 bluepy_path = os.path.dirname(bluepy.__file__)
+
+# Find face_recognition_models path
+face_models_path = os.path.dirname(face_recognition_models.__file__)
 
 a = Analysis(
     ['main.py'],
@@ -16,6 +20,9 @@ a = Analysis(
         # Include bluepy data files
         (os.path.join(bluepy_path, 'bluepy-helper'), 'bluepy'),
         (os.path.join(bluepy_path, '*.json'), 'bluepy'),
+        
+        # Include face recognition model files
+        (os.path.join(face_models_path, 'models'), 'face_recognition_models/models'),
     ],
     hiddenimports=[
         # Flask related
@@ -36,6 +43,7 @@ a = Analysis(
         
         # Computer vision & hardware
         'face_recognition',
+        'face_recognition_models',
         'cv2',
         'numpy',
         'picamera2',
@@ -86,6 +94,15 @@ if os.path.exists(helper_path):
     a.datas.append(('bluepy/bluepy-helper', helper_path, 'DATA'))
 else:
     print("WARNING: bluepy-helper not found at", helper_path)
+
+# Include face recognition model files more explicitly
+models_dir = os.path.join(face_models_path, 'models')
+for root, dirs, files in os.walk(models_dir):
+    for file in files:
+        if file.endswith('.dat'):
+            source = os.path.join(root, file)
+            dest = os.path.join('face_recognition_models/models', os.path.relpath(source, models_dir))
+            a.datas.append((dest, source, 'DATA'))
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
