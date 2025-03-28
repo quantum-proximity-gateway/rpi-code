@@ -51,7 +51,7 @@ There are 2 methods to setup and run this code. The first is much easier to setu
 To build the application, run the following command after navigating to `main/`:
 
 ```bash
-    pyinstaller pyinstaller.spec
+pyinstaller pyinstaller.spec
 ```
 
 #### Usage
