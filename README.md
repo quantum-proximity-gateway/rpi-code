@@ -14,12 +14,11 @@
     - [Usage](#usage-1)
 - [Raspberry Pi Pico](#raspberry-pi-pico)
   - [Requirements](#requirements-2)
-  - [Installation](#installation-1)
-  - [Usage](#usage-2)
+  - [Setup](#setup)
 - [Web App](#web-app)
   - [Requirements](#requirements-3)
-  - [Installation](#installation-2)
-  - [Usage](#usage-3)
+  - [Installation](#installation-1)
+  - [Usage](#usage-2)
 - [Troubleshooting](#troubleshooting)
   - [Liboqs](#liboqs)
 - [Misc.](#misc)
@@ -89,15 +88,13 @@ python main.py
 
 ### Requirements
 
-TODO
+- CircuitPython
 
-### Installation
+- Thonny
 
-TODO
+### Setup
 
-### Usage
-
-TODO
+Open `pico-hid.py` with Thonny and save the file to the Pico with the filename `code.py`. This is enough to get it so that whenever the Pico gets power, it will automatically run the contents of the file.
 
 ## Web App
 
