@@ -4,17 +4,22 @@
   <summary><strong>Table of Contents</strong></summary>
 
 - [Raspberry Pi 5](#raspberry-pi-5)
-  - [Requirements](#requirements)
-  - [Installation](#installation)
-  - [Usage](#usage)
+  - [Method 1 - PyInstaller](#method-1---pyinstaller)
+    - [Requirements](#requirements)
+    - [Building](#building)
+    - [Usage](#usage)
+  - [Method 2](#method-2)
+    - [Requirements](#requirements-1)
+    - [Installation](#installation)
+    - [Usage](#usage-1)
 - [Raspberry Pi Pico](#raspberry-pi-pico)
-  - [Requirements](#requirements-1)
-  - [Installation](#installation-1)
-  - [Usage](#usage-1)
-- [Web App](#web-app)
   - [Requirements](#requirements-2)
-  - [Installation](#installation-2)
+  - [Installation](#installation-1)
   - [Usage](#usage-2)
+- [Web App](#web-app)
+  - [Requirements](#requirements-3)
+  - [Installation](#installation-2)
+  - [Usage](#usage-3)
 - [Troubleshooting](#troubleshooting)
   - [Liboqs](#liboqs)
 - [Misc.](#misc)
@@ -34,17 +39,51 @@ The code is split into 3 main parts:
 
 ## Raspberry Pi 5
 
-### Requirements
+There are 2 methods to setup and run this code. The first is much easier to setup and is therefore recommended.
 
-TODO
+### Method 1 - PyInstaller
 
-### Installation
+#### Requirements
 
-TODO
+- Pyinstaller (Python)
 
-### Usage
+#### Building
 
-TODO
+To build the application, run the following command after navigating to `main/`:
+
+```bash
+    pyinstaller pyinstaller.spec
+```
+
+#### Usage
+
+From the same directory, run the following command to run the script:
+
+```bash
+./dist/proximity_gateway/proximity_gateway
+```
+
+### Method 2
+
+#### Requirements
+
+- Pip (Python)
+
+#### Installation
+
+To install all the dependencies, run the following command from the `main/` directory:
+
+```bash
+pip install -r requirements.txt
+```
+
+#### Usage
+
+To run the script from the same directory, run the following command:
+
+```bash
+python main.py
+```
 
 ## Raspberry Pi Pico
 
